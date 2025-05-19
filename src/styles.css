@@ -65,7 +65,7 @@ p {
   line-height: 1.6;
 }
 
-a {
+a.primary {
   font-weight: 500;
   color: var(--color-primary);
   text-decoration: inherit;

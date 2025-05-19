@@ -24,3 +24,22 @@ Run `npm run test` to run unit tests with [Vitest](https://vitest.dev).
 - Join the [Discord](https://chat.analogjs.org)
 - Follow us on [Twitter](https://twitter.com/analogjs)
 - Become a [Sponsor](https://github.com/sponsors/brandonroberts)
+
+
+## Folder structure
+
+
+/public
+  /assets
+    /images
+      property-thumbnail.jpg
+      floorplan.jpg
+      /rooms
+        living-room-1.jpg
+        living-room-2.jpg
+        bedroom-1.jpg
+        bedroom-2.jpg
+        bathroom-1.jpg
+        bathroom-2.jpg
+        balcony-1.jpg
+        balcony-2.jpg
