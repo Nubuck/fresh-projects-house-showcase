@@ -1,55 +1,35 @@
-import { Component, signal } from '@angular/core';
+// src/app/pages/index.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { PropertyCardComponent } from '../components/property-card.component';
+import { PropertyService } from '../services/property.service';
+import { Property } from '../models/property.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
+  imports: [CommonModule, PropertyCardComponent],
   template: `
-    <div>
-      <a href="https://analogjs.org/" target="_blank">
-        <img alt="Analog Logo" class="logo analog" src="/analog.svg" />
-      </a>
+    <div class="container mx-auto px-4 py-8">
+      <header class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-medium text-dark-text mb-2">Fresh Projects Spaces</h1>
+        <p class="text-light-text text-lg">Find your perfect home</p>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <app-property-card *ngFor="let property of properties" [property]="property"></app-property-card>
+      </div>
     </div>
-
-    <h2>Analog</h2>
-
-    <h3>The fullstack meta-framework for Angular!</h3>
-
-    <div class="card">
-      <button type="button" (click)="increment()">Count {{ count() }}</button>
-    </div>
-
-    <p class="read-the-docs">
-      <a href="https://analogjs.org" target="_blank">Docs</a> |
-      <a href="https://github.com/analogjs/analog" target="_blank">GitHub</a> |
-      <a href="https://github.com/sponsors/brandonroberts" target="_blank">
-        Sponsor
-      </a>
-    </p>
-  `,
-  styles: `
-    .logo {
-      will-change: filter;
-    }
-
-    .logo:hover {
-      filter: drop-shadow(0 0 2em #646cffaa);
-    }
-
-    .read-the-docs > * {
-      color: #fff;
-    }
-
-    @media (prefers-color-scheme: light) {
-      .read-the-docs > * {
-        color: #213547;
-      }
-    }
-  `,
+  `
 })
-export default class HomeComponent {
-  count = signal(0);
+export default class HomePage implements OnInit {
+  properties: Property[] = [];
 
-  increment() {
-    this.count.update((count) => count + 1);
+  constructor(private propertyService: PropertyService) {}
+
+  ngOnInit(): void {
+    this.propertyService.getProperties().subscribe(properties => {
+      this.properties = properties;
+    });
   }
 }

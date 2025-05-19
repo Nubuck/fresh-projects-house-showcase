@@ -1,16 +1,31 @@
+/* Import the brand fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+/* src/styles.css */
 @import 'tailwindcss';
 
-/* You can add global styles to this file, and also import other style files */
+
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  /* Brand Colors */
+  --color-primary: #74BA43;
+  --color-success: #42758F;
+  --color-warning: #EB6209;
+  --color-dark-background: #3D3D3C;
+  --color-light-background: #F0F5FF;
+  --color-dark-text: #152542;
+  --color-light-text: #3E547C;
+
+  /* Brand Fonts */
+  --font-family-0: 'Raleway', sans-serif;
+  --font-family-1: 'Inter', sans-serif;
+
+  /* Base styling */
+  font-family: var(--font-family-1), Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: var(--color-dark-text);
+  background-color: #f8f9fa;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -18,27 +33,46 @@
   -webkit-text-size-adjust: 100%;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-1);
+  color: var(--color-dark-text);
+  line-height: 1.3;
+}
+
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.5rem;
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+p {
+  color: var(--color-light-text);
+  line-height: 1.6;
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: inherit;
+}
+
+a:hover {
+  opacity: 0.9;
 }
 
 button {
@@ -47,40 +81,63 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: var(--font-family-1);
+  background-color: var(--color-primary);
+  color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: opacity 0.25s;
 }
 
 button:hover {
-  border-color: #646cff;
+  opacity: 0.9;
 }
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto var(--color-primary);
 }
 
-.card {
-  padding: 2em;
+/* Custom utility classes */
+.bg-primary {
+  background-color: var(--color-primary);
 }
 
-.logo {
-  @apply box-content;
+.text-primary {
+  color: var(--color-primary);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
+.border-primary {
+  border-color: var(--color-primary);
+}
 
-  a:hover {
-    color: #747bff;
-  }
+.bg-success {
+  background-color: var(--color-success);
+}
 
-  button {
-    background-color: #f9f9f9;
-  }
+.text-success {
+  color: var(--color-success);
+}
+
+.bg-warning {
+  background-color: var(--color-warning);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.bg-dark-background {
+  background-color: var(--color-dark-background);
+}
+
+.text-dark-text {
+  color: var(--color-dark-text);
+}
+
+.text-light-text {
+  color: var(--color-light-text);
+}
+
+.bg-light-background {
+  background-color: var(--color-light-background);
 }

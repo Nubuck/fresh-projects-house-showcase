@@ -1,0 +1,54 @@
+[
+  {
+    "id": "woonkamer",
+    "name": "Living Room (Woonkamer)",
+    "description": "A spacious, light-filled living area with large windows overlooking the garden. Perfect for relaxing and entertaining guests.",
+    "features": ["Large windows", "Spacious layout", "Plenty of natural light", "Beautiful view"],
+    "photos": ["/assets/images/rooms/living-room-1.jpg", "/assets/images/rooms/living-room-2.jpg"],
+    "coordinates": {
+      "x": 396,
+      "y": 0,
+      "width": 379,
+      "height": 410
+    }
+  },
+  {
+    "id": "slaapkamer",
+    "name": "Bedroom (Slaapkamer)",
+    "description": "A comfortable bedroom with ample space and natural light. Features include built-in wardrobes and a peaceful atmosphere.",
+    "features": ["Built-in wardrobes", "Comfortable space", "Quiet location", "Cozy atmosphere"],
+    "photos": ["/assets/images/rooms/bedroom-1.jpg", "/assets/images/rooms/bedroom-2.jpg"],
+    "coordinates": {
+      "x": 0,
+      "y": 126,
+      "width": 303,
+      "height": 368
+    }
+  },
+  {
+    "id": "badkamer",
+    "name": "Bathroom (Badkamer)",
+    "description": "A well-appointed bathroom with modern fixtures and finishes. Includes a shower and all necessary amenities.",
+    "features": ["Modern fixtures", "Shower", "Clean design", "Good lighting"],
+    "photos": ["/assets/images/rooms/bathroom-1.jpg", "/assets/images/rooms/bathroom-2.jpg"],
+    "coordinates": {
+      "x": 0,
+      "y": 494,
+      "width": 198,
+      "height": 119
+    }
+  },
+  {
+    "id": "balkon",
+    "name": "Balcony (Balkon)",
+    "description": "A private balcony offering beautiful views and outdoor space. Perfect for morning coffee or evening relaxation.",
+    "features": ["Outdoor space", "Great views", "Private area", "Fresh air"],
+    "photos": ["/assets/images/rooms/balcony-1.jpg", "/assets/images/rooms/balcony-2.jpg"],
+    "coordinates": {
+      "x": 0,
+      "y": 0,
+      "width": 126,
+      "height": 126
+    }
+  }
+]

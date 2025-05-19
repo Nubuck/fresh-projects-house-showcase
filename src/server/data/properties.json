@@ -1,0 +1,16 @@
+[
+  {
+    "id": "property-1",
+    "title": "Beautiful Family Apartment",
+    "address": "123 Peaceful Avenue, Northcliff, Johannesburg",
+    "price": "R 1,795,000",
+    "thumbnail": "/assets/images/property-thumbnail.jpg",
+    "description": "This beautiful family apartment offers the perfect blend of comfort, style, and functionality. Located in a peaceful neighborhood, the property features 1 bedroom, 1 bathroom, and a generous living space with a balcony providing excellent views.",
+    "stats": {
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "area": "50 sq m",
+      "type": "Apartment"
+    }
+  }
+]
