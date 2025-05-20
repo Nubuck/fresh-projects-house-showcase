@@ -1,4 +1,15 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, signal, computed, inject, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnChanges,
+  SimpleChanges,
+  signal,
+  computed,
+  inject,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { Room } from '../models/room.model';
 
@@ -8,36 +19,47 @@ import { Room } from '../models/room.model';
   imports: [CommonModule, NgClass],
   template: `
     <div class="w-full">
-      <h3 class="text-xl font-medium text-dark-text mb-4">Interactive Floorplan</h3>
-      <div [class.floorplan-horizontal]="orientation === 'horizontal'"
-           [class.floorplan-vertical]="orientation === 'vertical'"
-           class="floorplan-container w-full relative mx-auto rounded-lg overflow-hidden">
+      <h3 class="text-xl font-medium text-dark-text mb-4">
+        Interactive Floorplan
+      </h3>
+      <div
+        [class.floorplan-horizontal]="orientation === 'horizontal'"
+        [class.floorplan-vertical]="orientation === 'vertical'"
+        class="floorplan-container w-full relative mx-auto rounded-lg overflow-hidden"
+      >
         <!-- Floorplan Image -->
-        <img [src]="floorplanImage"
-             alt="Floorplan"
-             class="w-full border border-gray-200 rounded-lg">
+        <img
+          [src]="floorplanImage"
+          alt="Floorplan"
+          class="w-full border border-gray-200 rounded-lg"
+        />
 
         <!-- Clickable Room Areas with Integrated Labels -->
-        <div *ngFor="let room of rooms"
-             [style.left.%]="getPercentPosition(room.coordinates.x, true)"
-             [style.top.%]="getPercentPosition(room.coordinates.y, false)"
-             [style.width.%]="getPercentSize(room.coordinates.width, true)"
-             [style.height.%]="getPercentSize(room.coordinates.height, false)"
-             [ngClass]="{
-               'bg-[#74BA43]/40': activeRoomSignal() === room.id,
-               'border-[#74BA43]': activeRoomSignal() === room.id,
-               'border-2': activeRoomSignal() === room.id,
-               'bg-[#74BA43]/30': activeRoomSignal() !== room.id,
-               'hover:bg-[#74BA43]/30': activeRoomSignal() !== room.id,
-               'hover:border-[#74BA43]': activeRoomSignal() !== room.id,
-               'hover:border-2': activeRoomSignal() !== room.id
-             }"
-             class="absolute cursor-pointer transition-all duration-200 border border-transparent rounded-md bg-transparent flex items-center justify-center z-50"
-             (click)="selectRoom(room.id)">
 
+        <div
+          *ngFor="let room of rooms"
+          [style.left.%]="getPercentPosition(room.coordinates.x, true)"
+          [style.top.%]="getPercentPosition(room.coordinates.y, false)"
+          [style.width.%]="getPercentSize(room.coordinates.width, true)"
+          [style.height.%]="getPercentSize(room.coordinates.height, false)"
+          [ngClass]="{
+            'bg-[#74BA43]/40': activeRoomSignal() === room.id,
+            'border-[#74BA43]': activeRoomSignal() === room.id,
+            'border-2': activeRoomSignal() === room.id,
+            'bg-[#74BA43]/10': activeRoomSignal() !== room.id,
+            'hover:bg-[#74BA43]/30': activeRoomSignal() !== room.id,
+            'hover:border-[#74BA43]': activeRoomSignal() !== room.id,
+            'border-[#74BA43]/30': activeRoomSignal() !== room.id,
+            'hover:border-2': activeRoomSignal() !== room.id
+          }"
+          class="absolute cursor-pointer group p-3 transition-all duration-200 border rounded-md  flex flex-col items-start justify-start z-50"
+          (click)="selectRoom(room.id)"
+        >
           <!-- Integrated Room Label -->
-          <div class="px-2 py-1 rounded-md  text-xs font-medium shadow-sm select-none transition-colors duration-300"
-               [ngClass]="{'bg-[#74BA43]/50': activeRoomSignal() === room.id}">
+          <div
+            class="px-2 py-1 opacity-0 group-hover:opacity-100 rounded-full text-xs te font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start"
+            [ngClass]="{ 'bg-white': activeRoomSignal() === room.id, 'opacity-100':activeRoomSignal() === room.id, }"
+          >
             {{ room.name }}
           </div>
         </div>
@@ -45,27 +67,41 @@ import { Room } from '../models/room.model';
 
       <div class="mt-6 px-4 py-3 bg-light-background rounded-lg text-center">
         <p class="text-sm text-light-text mb-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 inline-block mr-1 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           Click on a room to view detailed information and photos
         </p>
       </div>
     </div>
   `,
-  styles: [`
-    .floorplan-container {
-      max-width: 800px;
-      margin: 0 auto;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .floorplan-horizontal {
-      max-width: 800px;
-    }
-    .floorplan-vertical {
-      max-width: 500px;
-    }
-  `]
+  styles: [
+    `
+      .floorplan-container {
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .floorplan-horizontal {
+        max-width: 800px;
+      }
+      .floorplan-vertical {
+        max-width: 500px;
+      }
+    `,
+  ],
 })
 export class FloorPlanComponent implements OnChanges {
   @Input() rooms: Room[] = [];
@@ -77,14 +113,14 @@ export class FloorPlanComponent implements OnChanges {
   activeRoomSignal = signal('');
 
   // Reference dimensions of the original floorplan images
-  private referenceWidth = 800;
-  private referenceHeight = 550;
-  private cdr = inject(ChangeDetectorRef);
+  referenceWidth = 800;
+  referenceHeight = 624;
+  cdr = inject(ChangeDetectorRef);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['orientation']) {
-      this.referenceWidth = this.orientation === 'horizontal' ? 800 : 400;
-      this.referenceHeight = this.orientation === 'horizontal' ? 550 : 600;
+      this.referenceWidth = this.orientation === 'horizontal' ? 800 : 550;
+      this.referenceHeight = this.orientation === 'horizontal' ? 624 : 800;
     }
 
     if (changes['activeRoom']) {
@@ -93,12 +129,19 @@ export class FloorPlanComponent implements OnChanges {
   }
 
   getPercentPosition(pixelValue: number, isHorizontal: boolean): number {
-    const reference = isHorizontal ? this.referenceWidth : this.referenceHeight;
+    // const reference = isHorizontal ? this.referenceWidth : this.referenceHeight;
+    const reference = isHorizontal
+      ? this.referenceWidth * 1.45
+      : this.referenceHeight * 1.3;
+
     return (pixelValue / reference) * 100;
   }
 
   getPercentSize(pixelValue: number, isHorizontal: boolean): number {
-    const reference = isHorizontal ? this.referenceWidth : this.referenceHeight;
+    const reference = isHorizontal
+      ? this.referenceWidth * 1.45
+      : this.referenceHeight * 1.7;
+    // const reference =  this.referenceWidth + this.referenceHeight;
     return (pixelValue / reference) * 100;
   }
 

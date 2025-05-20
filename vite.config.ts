@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import analog from '@analogjs/platform';
 import tailwindcss from '@tailwindcss/vite';
+import devtoolsJson from 'vite-plugin-devtools-json';
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -10,6 +11,7 @@ export default defineConfig(({ mode }) => ({
     mainFields: ['module'],
   },
   plugins: [
+    devtoolsJson(),
     analog(),
     tailwindcss(),
   ],
