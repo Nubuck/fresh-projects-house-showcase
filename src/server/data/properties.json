@@ -1,16 +1,38 @@
 [
   {
     "id": "property-1",
-    "title": "Beautiful Family Apartment",
-    "address": "123 Peaceful Avenue, Northcliff, Johannesburg",
-    "price": "R 1,795,000",
-    "thumbnail": "/assets/images/property-thumbnail.jpg",
-    "description": "This beautiful family apartment offers the perfect blend of comfort, style, and functionality. Located in a peaceful neighborhood, the property features 1 bedroom, 1 bathroom, and a generous living space with a balcony providing excellent views.",
+    "title": "Elegant Urban Retreat",
+    "address": "123 Downtown Avenue, Cityville",
+    "price": "$425,000",
+    "description": "This upmarket one-bedroom apartment offers a perfect blend of modern convenience and classical charm. Featuring a modern kitchen and bathroom with a rustic feel in the bedroom and living room. The private balcony provides an ideal outdoor space for relaxation with stunning city views. Walking distance to premium restaurants and shopping.",
+    "thumbnail": "/assets/images/property-1/thumbnail.jpg",
     "stats": {
       "bedrooms": 1,
       "bathrooms": 1,
-      "area": "50 sq m",
+      "area": "750 sq ft",
       "type": "Apartment"
+    },
+    "floorplan": {
+      "image": "/assets/images/property-1/floorplan.jpg",
+      "orientation": "horizontal"
+    }
+  },
+  {
+    "id": "property-2",
+    "title": "Modern Luxury Family Home",
+    "address": "456 Serenity Lane, Greenpark",
+    "price": "$895,000",
+    "description": "This stunning three-bedroom apartment is designed for upscale modern living. The minimalist architecture combines with thoughtful design for a spacious and comfortable living experience. The open-plan kitchen flows seamlessly into the living room and connects to a private balcony. Residents enjoy access to beautifully landscaped community gardens and premium amenities.",
+    "thumbnail": "/assets/images/property-2/thumbnail.jpg",
+    "stats": {
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "area": "1,450 sq ft",
+      "type": "Apartment"
+    },
+    "floorplan": {
+      "image": "/assets/images/property-2/floorplan.jpg",
+      "orientation": "vertical"
     }
   }
 ]

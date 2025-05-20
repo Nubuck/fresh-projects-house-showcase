@@ -1,54 +1,262 @@
 [
   {
-    "id": "woonkamer",
-    "name": "Living Room (Woonkamer)",
-    "description": "A spacious, light-filled living area with large windows overlooking the garden. Perfect for relaxing and entertaining guests.",
-    "features": ["Large windows", "Spacious layout", "Plenty of natural light", "Beautiful view"],
-    "photos": ["/assets/images/rooms/living-room-1.jpg", "/assets/images/rooms/living-room-2.jpg"],
+    "id": "living-room-1",
+    "propertyId": "property-1",
+    "name": "Living Room",
+    "description": "Spacious living area with rustic charm, abundant natural light, and hardwood flooring. Perfect for entertaining or relaxing with family.",
+    "features": [
+      "Hardwood flooring",
+      "Large windows for natural light",
+      "Ceiling fan",
+      "Open layout",
+      "Recessed lighting"
+    ],
+    "photos": ["/assets/images/property-1/living-room.jpg"],
     "coordinates": {
-      "x": 396,
-      "y": 0,
-      "width": 379,
-      "height": 410
+      "x": 127,
+      "y": 287,
+      "width": 419,
+      "height": 223
     }
   },
   {
-    "id": "slaapkamer",
-    "name": "Bedroom (Slaapkamer)",
-    "description": "A comfortable bedroom with ample space and natural light. Features include built-in wardrobes and a peaceful atmosphere.",
-    "features": ["Built-in wardrobes", "Comfortable space", "Quiet location", "Cozy atmosphere"],
-    "photos": ["/assets/images/rooms/bedroom-1.jpg", "/assets/images/rooms/bedroom-2.jpg"],
+    "id": "bedroom-1",
+    "propertyId": "property-1",
+    "name": "Bedroom",
+    "description": "Cozy bedroom with ample space for a queen-sized bed and additional furniture. Includes built-in storage and access to the balcony.",
+    "features": [
+      "Built-in closet",
+      "Carpet flooring",
+      "Balcony access",
+      "En-suite bathroom",
+      "Blackout curtains"
+    ],
+    "photos": ["/assets/images/property-1/bedroom.jpg"],
     "coordinates": {
-      "x": 0,
-      "y": 126,
-      "width": 303,
-      "height": 368
+      "x": 319,
+      "y": 67,
+      "width": 227,
+      "height": 190
     }
   },
   {
-    "id": "badkamer",
-    "name": "Bathroom (Badkamer)",
-    "description": "A well-appointed bathroom with modern fixtures and finishes. Includes a shower and all necessary amenities.",
-    "features": ["Modern fixtures", "Shower", "Clean design", "Good lighting"],
-    "photos": ["/assets/images/rooms/bathroom-1.jpg", "/assets/images/rooms/bathroom-2.jpg"],
+    "id": "kitchen-1",
+    "propertyId": "property-1",
+    "name": "Kitchen",
+    "description": "Modern kitchen with high-end appliances, custom cabinetry, and quartz countertops. Efficiently designed for the home chef.",
+    "features": [
+      "Stainless steel appliances",
+      "Quartz countertops",
+      "Custom cabinetry",
+      "Tile backsplash",
+      "Under-cabinet lighting"
+    ],
+    "photos": ["/assets/images/property-1/kitchen.jpg"],
     "coordinates": {
-      "x": 0,
-      "y": 494,
-      "width": 198,
-      "height": 119
+      "x": 127,
+      "y": 420,
+      "width": 99,
+      "height": 109
     }
   },
   {
-    "id": "balkon",
-    "name": "Balcony (Balkon)",
-    "description": "A private balcony offering beautiful views and outdoor space. Perfect for morning coffee or evening relaxation.",
-    "features": ["Outdoor space", "Great views", "Private area", "Fresh air"],
-    "photos": ["/assets/images/rooms/balcony-1.jpg", "/assets/images/rooms/balcony-2.jpg"],
+    "id": "bathroom-1",
+    "propertyId": "property-1",
+    "name": "Bathroom",
+    "description": "Elegant bathroom with modern fixtures, a spacious shower, and premium finishes. Combines functionality with style.",
+    "features": [
+      "Walk-in shower",
+      "Porcelain tile flooring",
+      "Floating vanity",
+      "LED mirror",
+      "Heated towel rack"
+    ],
+    "photos": ["/assets/images/property-1/bathroom.jpg"],
     "coordinates": {
-      "x": 0,
-      "y": 0,
-      "width": 126,
-      "height": 126
+      "x": 88,
+      "y": 67,
+      "width": 141,
+      "height": 190
+    }
+  },
+  {
+    "id": "balcony-1",
+    "propertyId": "property-1",
+    "name": "Balcony",
+    "description": "Private balcony offering urban views and outdoor space for relaxation or al fresco dining.",
+    "features": [
+      "Private outdoor space",
+      "Urban views",
+      "Weather-resistant flooring",
+      "Space for furniture",
+      "Exterior lighting"
+    ],
+    "photos": ["/assets/images/property-1/balcony.jpg"],
+    "coordinates": {
+      "x": 656,
+      "y": 67,
+      "width": 84,
+      "height": 190
+    }
+  },
+  {
+    "id": "living-room-2",
+    "propertyId": "property-2",
+    "name": "Living Room",
+    "description": "Contemporary open-concept living area seamlessly flowing into the kitchen and balcony. Featuring minimalist design and premium finishes.",
+    "features": [
+      "Open-concept layout",
+      "Floor-to-ceiling windows",
+      "Engineered hardwood flooring",
+      "Recessed lighting",
+      "Smart home integration"
+    ],
+    "photos": ["/assets/images/property-2/living-room.jpg"],
+    "coordinates": {
+      "x": 83,
+      "y": 288,
+      "width": 157,
+      "height": 137
+    }
+  },
+  {
+    "id": "kitchen-2",
+    "propertyId": "property-2",
+    "name": "Kitchen",
+    "description": "Designer kitchen with top-of-the-line appliances, custom cabinetry, and waterfall island. Perfect for gourmet cooking and entertaining.",
+    "features": [
+      "Premium appliance package",
+      "Quartz countertops",
+      "Custom cabinetry",
+      "Island with seating",
+      "Designer lighting fixtures"
+    ],
+    "photos": ["/assets/images/property-2/kitchen.jpg"],
+    "coordinates": {
+      "x": 83,
+      "y": 170,
+      "width": 157,
+      "height": 118
+    }
+  },
+  {
+    "id": "master-bedroom-2",
+    "propertyId": "property-2",
+    "name": "Master Bedroom",
+    "description": "Spacious master suite with en-suite bathroom, walk-in closet, and premium finishes throughout. A private sanctuary for relaxation.",
+    "features": [
+      "Walk-in closet",
+      "En-suite bathroom",
+      "Luxury carpet flooring",
+      "Accent lighting",
+      "Blackout window treatments"
+    ],
+    "photos": ["/assets/images/property-2/master-bedroom.jpg"],
+    "coordinates": {
+      "x": 273,
+      "y": 105,
+      "width": 142,
+      "height": 125
+    }
+  },
+  {
+    "id": "bedroom-2-2",
+    "propertyId": "property-2",
+    "name": "Bedroom 2",
+    "description": "Comfortable second bedroom with ample space for a queen bed and additional furniture. Features large windows for abundant natural light.",
+    "features": [
+      "Spacious layout",
+      "Built-in storage",
+      "Large windows",
+      "Neutral color palette",
+      "Plush carpeting"
+    ],
+    "photos": ["/assets/images/property-2/bedroom-2.jpg"],
+    "coordinates": {
+      "x": 273,
+      "y": 230,
+      "width": 142,
+      "height": 78
+    }
+  },
+  {
+    "id": "bedroom-3-2",
+    "propertyId": "property-2",
+    "name": "Bedroom 3",
+    "description": "Versatile third bedroom ideal for a child's room, home office, or guest accommodation. Features custom built-ins and garden views.",
+    "features": [
+      "Built-in desk",
+      "Custom closet system",
+      "Garden views",
+      "Natural light",
+      "Durable flooring"
+    ],
+    "photos": ["/assets/images/property-2/bedroom-3.jpg"],
+    "coordinates": {
+      "x": 273,
+      "y": 368,
+      "width": 142,
+      "height": 120
+    }
+  },
+  {
+    "id": "master-bathroom-2",
+    "propertyId": "property-2",
+    "name": "Master Bathroom",
+    "description": "Luxurious master bathroom with double vanity, soaking tub, and separate shower. Features high-end fixtures and premium materials.",
+    "features": [
+      "Double vanity",
+      "Soaking tub",
+      "Walk-in shower",
+      "Heated floors",
+      "Designer fixtures"
+    ],
+    "photos": ["/assets/images/property-2/master-bathroom.jpg"],
+    "coordinates": {
+      "x": 83,
+      "y": 105,
+      "width": 94,
+      "height": 65
+    }
+  },
+  {
+    "id": "bathroom-2-2",
+    "propertyId": "property-2",
+    "name": "Bathroom 2",
+    "description": "Stylish second bathroom with premium fixtures and finishes. Designed for both functionality and aesthetics.",
+    "features": [
+      "Floating vanity",
+      "Glass shower enclosure",
+      "Porcelain tile",
+      "Modern fixtures",
+      "Efficient storage"
+    ],
+    "photos": ["/assets/images/property-2/bathroom-2.jpg"],
+    "coordinates": {
+      "x": 273,
+      "y": 308,
+      "width": 142,
+      "height": 60
+    }
+  },
+  {
+    "id": "balcony-2",
+    "propertyId": "property-2",
+    "name": "Balcony",
+    "description": "Private balcony with ample space for outdoor furniture and potted plants. The perfect spot to enjoy morning coffee or evening relaxation.",
+    "features": [
+      "Private outdoor space",
+      "Garden views",
+      "Weather-resistant flooring",
+      "Built-in planters",
+      "Exterior lighting"
+    ],
+    "photos": ["/assets/images/property-2/balcony.jpg"],
+    "coordinates": {
+      "x": 83,
+      "y": 425,
+      "width": 112,
+      "height": 40
     }
   }
 ]
