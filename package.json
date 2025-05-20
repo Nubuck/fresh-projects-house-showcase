@@ -6,9 +6,10 @@
     "node": ">=18.19.1"
   },
   "scripts": {
+    "start": "npm run dev",
+    "mix": "npx repomix",
     "ng": "ng",
     "dev": "ng serve",
-    "start": "npm run dev",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -48,6 +49,7 @@
     "autoprefixer": "^10.4.21",
     "jsdom": "^22.0.0",
     "postcss": "^8.5.3",
+    "sharp": "^0.33.5",
     "tailwindcss": "^4.1.7",
     "typescript": "~5.8.0",
     "vite": "^6.0.0",

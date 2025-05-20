@@ -71,8 +71,8 @@ src/app/services/property.service.ts
 src/app/services/room.service.ts
 src/main.server.ts
 src/main.ts
-src/server/routes/api/v1/hello.ts
 src/server/routes/api/v1/properties.get.ts
+src/server/routes/api/v1/properties/[id].get.ts
 src/server/routes/api/v1/rooms.get.ts
 src/server/routes/api/v1/rooms/[id].get.ts
 src/styles.css
@@ -86,6 +86,78 @@ vite.config.ts
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="src/app/app.component.spec.ts">
+ 1: import { TestBed } from '@angular/core/testing';
+ 2: import { provideRouter } from '@angular/router';
+ 3: import { provideLocationMocks } from '@angular/common/testing';
+ 4: import { AppComponent } from './app.component';
+ 5: describe('AppComponent', () => {
+ 6:   beforeEach(async () => {
+ 7:     await TestBed.configureTestingModule({
+ 8:       imports: [AppComponent],
+ 9:       providers: [provideRouter([]), provideLocationMocks()],
+10:     }).compileComponents();
+11:   });
+12:   it('should create the app', () => {
+13:     const fixture = TestBed.createComponent(AppComponent);
+14:     const app = fixture.componentInstance;
+15:     expect(app).toBeTruthy();
+16:   });
+17: });
+</file>
+
+<file path="src/app/app.component.ts">
+ 1: import { Component } from '@angular/core';
+ 2: import { RouterOutlet } from '@angular/router';
+ 3: @Component({
+ 4:   selector: 'app-root',
+ 5:   standalone: true,
+ 6:   imports: [RouterOutlet],
+ 7:   template: `<router-outlet />`,
+ 8:   styles: `
+ 9:     :host {
+10:       max-width: 1280px;
+11:       margin: 0 auto;
+12:       padding: 2rem;
+13:       text-align: center;
+14:     }
+15:   `,
+16: })
+17: export class AppComponent {}
+</file>
+
+<file path="src/app/app.config.server.ts">
+1: import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+2: import { provideServerRendering } from '@angular/platform-server';
+3: import { appConfig } from './app.config';
+4: const serverConfig: ApplicationConfig = {
+5:   providers: [provideServerRendering()],
+6: };
+7: export const config = mergeApplicationConfig(appConfig, serverConfig);
+</file>
+
+<file path="src/app/app.config.ts">
+ 1: import {
+ 2:   provideHttpClient,
+ 3:   withFetch,
+ 4:   withInterceptors,
+ 5: } from '@angular/common/http';
+ 6: import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+ 7: import { provideClientHydration } from '@angular/platform-browser';
+ 8: import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
+ 9: export const appConfig: ApplicationConfig = {
+10:   providers: [
+11:     provideZoneChangeDetection({ eventCoalescing: true }),
+12:     provideFileRouter(),
+13:     provideHttpClient(
+14:       withFetch(),
+15:       withInterceptors([requestContextInterceptor])
+16:     ),
+17:     provideClientHydration(),
+18:   ],
+19: };
+</file>
 
 <file path="src/app/app.routes.ts">
  1: import { Routes } from '@angular/router';
@@ -513,6 +585,23 @@ This section contains the contents of the repository's files.
 16: }
 </file>
 
+<file path="src/main.server.ts">
+1: import 'zone.js/node';
+2: import '@angular/platform-server/init';
+3: import { render } from '@analogjs/router/server';
+4: import { AppComponent } from './app/app.component';
+5: import { config } from './app/app.config.server';
+6: export default render(AppComponent, config);
+</file>
+
+<file path="src/main.ts">
+1: import 'zone.js';
+2: import { bootstrapApplication } from '@angular/platform-browser';
+3: import { AppComponent } from './app/app.component';
+4: import { appConfig } from './app/app.config';
+5: bootstrapApplication(AppComponent, appConfig);
+</file>
+
 <file path="src/server/routes/api/v1/properties.get.ts">
 1: import { defineEventHandler } from 'h3';
 2: import fs from 'fs';
@@ -522,6 +611,25 @@ This section contains the contents of the repository's files.
 6:   const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 7:   return data;
 8: });
+</file>
+
+<file path="src/server/routes/api/v1/properties/[id].get.ts">
+ 1: import { defineEventHandler, getRouterParam, createError } from 'h3';
+ 2: import fs from 'fs';
+ 3: import path from 'path';
+ 4: export default defineEventHandler((event) => {
+ 5:   const id = getRouterParam(event, 'id');
+ 6:   const filePath = path.join(process.cwd(), 'src/server/data/properties.json');
+ 7:   const properties = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+ 8:   const property = properties.find((p: { id: string }) => p.id === id);
+ 9:   if (!property) {
+10:     throw createError({
+11:       statusCode: 404,
+12:       statusMessage: 'Property not found'
+13:     });
+14:   }
+15:   return property;
+16: });
 </file>
 
 <file path="src/server/routes/api/v1/rooms.get.ts">
@@ -552,6 +660,23 @@ This section contains the contents of the repository's files.
 14:   }
 15:   return room;
 16: });
+</file>
+
+<file path="src/test-setup.ts">
+ 1: import '@analogjs/vitest-angular/setup-zone';
+ 2: import {
+ 3:   BrowserDynamicTestingModule,
+ 4:   platformBrowserDynamicTesting,
+ 5: } from '@angular/platform-browser-dynamic/testing';
+ 6: import { getTestBed } from '@angular/core/testing';
+ 7: getTestBed().initTestEnvironment(
+ 8:   BrowserDynamicTestingModule,
+ 9:   platformBrowserDynamicTesting()
+10: );
+</file>
+
+<file path="src/vite-env.d.ts">
+1: 
 </file>
 
 <file path="tailwind.config.js">
@@ -592,6 +717,58 @@ This section contains the contents of the repository's files.
 35:   },
 36:   plugins: [],
 37: }
+</file>
+
+<file path="tsconfig.app.json">
+ 1: /* To learn more about this file see: https://angular.io/config/tsconfig. */
+ 2: {
+ 3:   "extends": "./tsconfig.json",
+ 4:   "compilerOptions": {
+ 5:     "outDir": "./out-tsc/app",
+ 6:     "types": []
+ 7:   },
+ 8:   "files": ["src/main.ts", "src/main.server.ts"],
+ 9:   "include": [
+10:     "src/**/*.d.ts",
+11:     "src/app/pages/**/*.page.ts",
+12:     "src/server/middleware/**/*.ts"
+13:   ]
+14: }
+</file>
+
+<file path="tsconfig.json">
+ 1: /* To learn more about this file see: https://angular.io/config/tsconfig. */
+ 2: {
+ 3:   "compileOnSave": false,
+ 4:   "compilerOptions": {
+ 5:     "baseUrl": "./",
+ 6:     "outDir": "./dist/out-tsc",
+ 7:     "forceConsistentCasingInFileNames": true,
+ 8:     "strict": true,
+ 9:     "noImplicitOverride": true,
+10:     "noPropertyAccessFromIndexSignature": true,
+11:     "noImplicitReturns": true,
+12:     "noFallthroughCasesInSwitch": true,
+13:     "sourceMap": true,
+14:     "declaration": false,
+15:     "downlevelIteration": true,
+16:     "experimentalDecorators": true,
+17:     "moduleResolution": "bundler",
+18:     "isolatedModules": true,
+19:     "importHelpers": true,
+20:     "target": "ES2022",
+21:     "module": "ES2022",
+22:     "lib": ["ES2022", "dom"],
+23:     "useDefineForClassFields": false,
+24:     "skipLibCheck": true
+25:   },
+26:   "angularCompilerOptions": {
+27:     "enableI18nLegacyMessageIdFormat": false,
+28:     "strictInjectionParameters": true,
+29:     "strictInputAccessModifiers": true,
+30:     "strictTemplates": true
+31:   }
+32: }
 </file>
 
 <file path="angular.json">
@@ -663,126 +840,56 @@ This section contains the contents of the repository's files.
  6:     "node": ">=18.19.1"
  7:   },
  8:   "scripts": {
- 9:     "ng": "ng",
-10:     "dev": "ng serve",
-11:     "start": "npm run dev",
-12:     "build": "ng build",
-13:     "watch": "ng build --watch --configuration development",
-14:     "test": "ng test"
-15:   },
-16:   "private": true,
-17:   "dependencies": {
-18:     "@analogjs/content": "^1.16.1",
-19:     "@analogjs/router": "^1.16.1",
-20:     "@angular/animations": "^19.0.0",
-21:     "@angular/common": "^19.0.0",
-22:     "@angular/compiler": "^19.0.0",
-23:     "@angular/core": "^19.0.0",
-24:     "@angular/forms": "^19.0.0",
-25:     "@angular/platform-browser": "^19.0.0",
-26:     "@angular/platform-browser-dynamic": "^19.0.0",
-27:     "@angular/platform-server": "^19.0.0",
-28:     "@angular/router": "^19.0.0",
-29:     "@tailwindcss/vite": "^4.1.4",
+ 9:     "start": "npm run dev",
+10:     "mix": "npx repomix",
+11:     "ng": "ng",
+12:     "dev": "ng serve",
+13:     "build": "ng build",
+14:     "watch": "ng build --watch --configuration development",
+15:     "test": "ng test"
+16:   },
+17:   "private": true,
+18:   "dependencies": {
+19:     "@analogjs/content": "^1.16.1",
+20:     "@analogjs/router": "^1.16.1",
+21:     "@angular/animations": "^19.0.0",
+22:     "@angular/common": "^19.0.0",
+23:     "@angular/compiler": "^19.0.0",
+24:     "@angular/core": "^19.0.0",
+25:     "@angular/forms": "^19.0.0",
+26:     "@angular/platform-browser": "^19.0.0",
+27:     "@angular/platform-browser-dynamic": "^19.0.0",
+28:     "@angular/platform-server": "^19.0.0",
+29:     "@angular/router": "^19.0.0",
 30:     "front-matter": "^4.0.2",
 31:     "marked": "^15.0.7",
 32:     "marked-gfm-heading-id": "^4.1.1",
 33:     "marked-highlight": "^2.2.1",
 34:     "marked-mangle": "^1.1.10",
-35:     "postcss": "^8.5.3",
-36:     "prismjs": "^1.29.0",
-37:     "rxjs": "~7.8.0",
-38:     "tailwindcss": "^4.1.4",
-39:     "tslib": "^2.3.0",
-40:     "zone.js": "~0.15.0"
-41:   },
-42:   "devDependencies": {
-43:     "@analogjs/platform": "^1.16.1",
-44:     "@analogjs/vite-plugin-angular": "^1.16.1",
-45:     "@analogjs/vitest-angular": "^1.16.1",
-46:     "@angular-devkit/build-angular": "^19.0.0",
-47:     "@angular/build": "^19.0.0",
-48:     "@angular/cli": "^19.0.0",
-49:     "@angular/compiler-cli": "^19.0.0",
+35:     "prismjs": "^1.29.0",
+36:     "rxjs": "~7.8.0",
+37:     "tslib": "^2.3.0",
+38:     "zone.js": "~0.15.0"
+39:   },
+40:   "devDependencies": {
+41:     "@analogjs/platform": "^1.16.1",
+42:     "@analogjs/vite-plugin-angular": "^1.16.1",
+43:     "@analogjs/vitest-angular": "^1.16.1",
+44:     "@angular-devkit/build-angular": "^19.0.0",
+45:     "@angular/build": "^19.0.0",
+46:     "@angular/cli": "^19.0.0",
+47:     "@angular/compiler-cli": "^19.0.0",
+48:     "@tailwindcss/vite": "^4.1.7",
+49:     "autoprefixer": "^10.4.21",
 50:     "jsdom": "^22.0.0",
-51:     "typescript": "~5.8.0",
-52:     "vite": "^6.0.0",
-53:     "vite-tsconfig-paths": "^4.2.0",
-54:     "vitest": "^3.0.0"
-55:   }
-56: }
-</file>
-
-<file path="src/app/app.component.spec.ts">
- 1: import { TestBed } from '@angular/core/testing';
- 2: import { provideRouter } from '@angular/router';
- 3: import { provideLocationMocks } from '@angular/common/testing';
- 4: import { AppComponent } from './app.component';
- 5: describe('AppComponent', () => {
- 6:   beforeEach(async () => {
- 7:     await TestBed.configureTestingModule({
- 8:       imports: [AppComponent],
- 9:       providers: [provideRouter([]), provideLocationMocks()],
-10:     }).compileComponents();
-11:   });
-12:   it('should create the app', () => {
-13:     const fixture = TestBed.createComponent(AppComponent);
-14:     const app = fixture.componentInstance;
-15:     expect(app).toBeTruthy();
-16:   });
-17: });
-</file>
-
-<file path="src/app/app.component.ts">
- 1: import { Component } from '@angular/core';
- 2: import { RouterOutlet } from '@angular/router';
- 3: @Component({
- 4:   selector: 'app-root',
- 5:   standalone: true,
- 6:   imports: [RouterOutlet],
- 7:   template: `<router-outlet />`,
- 8:   styles: `
- 9:     :host {
-10:       max-width: 1280px;
-11:       margin: 0 auto;
-12:       padding: 2rem;
-13:       text-align: center;
-14:     }
-15:   `,
-16: })
-17: export class AppComponent {}
-</file>
-
-<file path="src/app/app.config.server.ts">
-1: import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
-2: import { provideServerRendering } from '@angular/platform-server';
-3: import { appConfig } from './app.config';
-4: const serverConfig: ApplicationConfig = {
-5:   providers: [provideServerRendering()],
-6: };
-7: export const config = mergeApplicationConfig(appConfig, serverConfig);
-</file>
-
-<file path="src/app/app.config.ts">
- 1: import {
- 2:   provideHttpClient,
- 3:   withFetch,
- 4:   withInterceptors,
- 5: } from '@angular/common/http';
- 6: import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
- 7: import { provideClientHydration } from '@angular/platform-browser';
- 8: import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
- 9: export const appConfig: ApplicationConfig = {
-10:   providers: [
-11:     provideZoneChangeDetection({ eventCoalescing: true }),
-12:     provideFileRouter(),
-13:     provideHttpClient(
-14:       withFetch(),
-15:       withInterceptors([requestContextInterceptor])
-16:     ),
-17:     provideClientHydration(),
-18:   ],
-19: };
+51:     "postcss": "^8.5.3",
+52:     "tailwindcss": "^4.1.7",
+53:     "typescript": "~5.8.0",
+54:     "vite": "^6.0.0",
+55:     "vite-tsconfig-paths": "^4.2.0",
+56:     "vitest": "^3.0.0"
+57:   }
+58: }
 </file>
 
 <file path="src/app/pages/index.page.ts">
@@ -818,31 +925,37 @@ This section contains the contents of the repository's files.
 30: }
 </file>
 
-<file path="src/main.server.ts">
-1: import 'zone.js/node';
-2: import '@angular/platform-server/init';
-3: import { render } from '@analogjs/router/server';
-4: import { AppComponent } from './app/app.component';
-5: import { config } from './app/app.config.server';
-6: export default render(AppComponent, config);
-</file>
-
-<file path="src/main.ts">
-1: import 'zone.js';
-2: import { bootstrapApplication } from '@angular/platform-browser';
-3: import { AppComponent } from './app/app.component';
-4: import { appConfig } from './app/app.config';
-5: bootstrapApplication(AppComponent, appConfig);
-</file>
-
-<file path="src/server/routes/api/v1/hello.ts">
-1: import { defineEventHandler } from 'h3';
-2: export default defineEventHandler(() => ({ message: 'Hello World' }));
+<file path="vite.config.ts">
+ 1: import { defineConfig } from 'vite';
+ 2: import analog from '@analogjs/platform';
+ 3: import tailwindcss from '@tailwindcss/vite';
+ 4: export default defineConfig(({ mode }) => ({
+ 5:   build: {
+ 6:     target: ['es2020'],
+ 7:   },
+ 8:   resolve: {
+ 9:     mainFields: ['module'],
+10:   },
+11:   plugins: [
+12:     analog(),
+13:     tailwindcss(),
+14:   ],
+15:   test: {
+16:     globals: true,
+17:     environment: 'jsdom',
+18:     setupFiles: ['src/test-setup.ts'],
+19:     include: ['**/*.spec.ts'],
+20:     reporters: ['default'],
+21:   },
+22:   define: {
+23:     'import.meta.vitest': mode !== 'production',
+24:   },
+25: }));
 </file>
 
 <file path="src/styles.css">
-  1: @import 'tailwindcss';
-  2: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Raleway:wght@300;400;500;600&display=swap');
+  1: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Raleway:wght@300;400;500;600&display=swap');
+  2: @import 'tailwindcss';
   3: :root {
   4:   --color-primary: #74BA43;
   5:   --color-success: #42758F;
@@ -891,7 +1004,7 @@ This section contains the contents of the repository's files.
  48:   color: var(--color-light-text);
  49:   line-height: 1.6;
  50: }
- 51: a {
+ 51: a.primary {
  52:   font-weight: 500;
  53:   color: var(--color-primary);
  54:   text-decoration: inherit;
@@ -951,99 +1064,6 @@ This section contains the contents of the repository's files.
 108: .bg-light-background {
 109:   background-color: var(--color-light-background);
 110: }
-</file>
-
-<file path="src/test-setup.ts">
- 1: import '@analogjs/vitest-angular/setup-zone';
- 2: import {
- 3:   BrowserDynamicTestingModule,
- 4:   platformBrowserDynamicTesting,
- 5: } from '@angular/platform-browser-dynamic/testing';
- 6: import { getTestBed } from '@angular/core/testing';
- 7: getTestBed().initTestEnvironment(
- 8:   BrowserDynamicTestingModule,
- 9:   platformBrowserDynamicTesting()
-10: );
-</file>
-
-<file path="src/vite-env.d.ts">
-1: 
-</file>
-
-<file path="tsconfig.app.json">
- 1: /* To learn more about this file see: https://angular.io/config/tsconfig. */
- 2: {
- 3:   "extends": "./tsconfig.json",
- 4:   "compilerOptions": {
- 5:     "outDir": "./out-tsc/app",
- 6:     "types": []
- 7:   },
- 8:   "files": ["src/main.ts", "src/main.server.ts"],
- 9:   "include": [
-10:     "src/**/*.d.ts",
-11:     "src/app/pages/**/*.page.ts",
-12:     "src/server/middleware/**/*.ts"
-13:   ]
-14: }
-</file>
-
-<file path="tsconfig.json">
- 1: /* To learn more about this file see: https://angular.io/config/tsconfig. */
- 2: {
- 3:   "compileOnSave": false,
- 4:   "compilerOptions": {
- 5:     "baseUrl": "./",
- 6:     "outDir": "./dist/out-tsc",
- 7:     "forceConsistentCasingInFileNames": true,
- 8:     "strict": true,
- 9:     "noImplicitOverride": true,
-10:     "noPropertyAccessFromIndexSignature": true,
-11:     "noImplicitReturns": true,
-12:     "noFallthroughCasesInSwitch": true,
-13:     "sourceMap": true,
-14:     "declaration": false,
-15:     "downlevelIteration": true,
-16:     "experimentalDecorators": true,
-17:     "moduleResolution": "bundler",
-18:     "isolatedModules": true,
-19:     "importHelpers": true,
-20:     "target": "ES2022",
-21:     "module": "ES2022",
-22:     "lib": ["ES2022", "dom"],
-23:     "useDefineForClassFields": false,
-24:     "skipLibCheck": true
-25:   },
-26:   "angularCompilerOptions": {
-27:     "enableI18nLegacyMessageIdFormat": false,
-28:     "strictInjectionParameters": true,
-29:     "strictInputAccessModifiers": true,
-30:     "strictTemplates": true
-31:   }
-32: }
-</file>
-
-<file path="vite.config.ts">
- 1: import { defineConfig } from 'vite';
- 2: import analog from '@analogjs/platform';
- 3: export default defineConfig(({ mode }) => ({
- 4:   build: {
- 5:     target: ['es2020'],
- 6:   },
- 7:   resolve: {
- 8:     mainFields: ['module'],
- 9:   },
-10:   plugins: [analog()],
-11:   test: {
-12:     globals: true,
-13:     environment: 'jsdom',
-14:     setupFiles: ['src/test-setup.ts'],
-15:     include: ['**/*.spec.ts'],
-16:     reporters: ['default'],
-17:   },
-18:   define: {
-19:     'import.meta.vitest': mode !== 'production',
-20:   },
-21: }));
 </file>
 
 </files>
