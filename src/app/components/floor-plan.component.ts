@@ -24,19 +24,20 @@ import { Room } from '../models/room.model';
              [style.width.%]="getPercentSize(room.coordinates.width, true)"
              [style.height.%]="getPercentSize(room.coordinates.height, false)"
              [ngClass]="{
-               'bg-primary/40': activeRoomSignal() === room.id,
-               'border-primary': activeRoomSignal() === room.id,
+               'bg-[#74BA43]/40': activeRoomSignal() === room.id,
+               'border-[#74BA43]': activeRoomSignal() === room.id,
                'border-2': activeRoomSignal() === room.id,
-               'hover:bg-primary/30': activeRoomSignal() !== room.id,
-               'hover:border-primary': activeRoomSignal() !== room.id,
+               'bg-[#74BA43]/30': activeRoomSignal() !== room.id,
+               'hover:bg-[#74BA43]/30': activeRoomSignal() !== room.id,
+               'hover:border-[#74BA43]': activeRoomSignal() !== room.id,
                'hover:border-2': activeRoomSignal() !== room.id
              }"
-             class="absolute cursor-pointer transition-all duration-200 border border-transparent rounded-md bg-transparent flex items-center justify-center"
+             class="absolute cursor-pointer transition-all duration-200 border border-transparent rounded-md bg-transparent flex items-center justify-center z-50"
              (click)="selectRoom(room.id)">
 
           <!-- Integrated Room Label -->
-          <div class="px-2 py-1 rounded-md text-white text-xs font-medium bg-gray-700/75 shadow-sm select-none transition-colors duration-300"
-               [ngClass]="{'bg-primary': activeRoomSignal() === room.id}">
+          <div class="px-2 py-1 rounded-md  text-xs font-medium shadow-sm select-none transition-colors duration-300"
+               [ngClass]="{'bg-[#74BA43]/50': activeRoomSignal() === room.id}">
             {{ room.name }}
           </div>
         </div>
