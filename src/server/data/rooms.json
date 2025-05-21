@@ -11,7 +11,10 @@
       "Open layout",
       "Recessed lighting"
     ],
-    "photos": ["/assets/images/property-1/living-room.jpg"],
+    "photos": [
+      "/assets/images/property-1/living-room.jpg",
+      "/assets/images/property-1/living-room-2.jpg"
+    ],
     "coordinates": {
       "x": 232,
       "y": 285,
@@ -31,7 +34,10 @@
       "En-suite bathroom",
       "Blackout curtains"
     ],
-    "photos": ["/assets/images/property-1/bedroom.jpg"],
+    "photos": [
+      "/assets/images/property-1/bedroom.jpg",
+      "/assets/images/property-1/bedroom-2.jpg"
+    ],
     "coordinates": {
       "x": 230,
       "y": 44,
@@ -51,7 +57,10 @@
       "Tile backsplash",
       "Under-cabinet lighting"
     ],
-    "photos": ["/assets/images/property-1/kitchen.jpg"],
+    "photos": [
+      "/assets/images/property-1/kitchen.jpg",
+      "/assets/images/property-1/kitchen-2.jpg"
+    ],
     "coordinates": {
       "x": 58,
       "y": 396,
@@ -71,7 +80,10 @@
       "LED mirror",
       "Heated towel rack"
     ],
-    "photos": ["/assets/images/property-1/bathroom.jpg"],
+    "photos": [
+      "/assets/images/property-1/bathroom.jpg",
+      "/assets/images/property-1/bathroom-2.jpg"
+    ],
     "coordinates": {
       "x": 73,
       "y": 36,
@@ -91,7 +103,10 @@
       "Space for furniture",
       "Exterior lighting"
     ],
-    "photos": ["/assets/images/property-1/balcony.jpg"],
+    "photos": [
+      "/assets/images/property-1/balcony.jpg",
+      "/assets/images/property-1/balcony-2.jpg"
+    ],
     "coordinates": {
       "x": 670,
       "y": 36,
@@ -111,7 +126,10 @@
       "Recessed lighting",
       "Smart home integration"
     ],
-    "photos": ["/assets/images/property-2/living-room.jpg"],
+    "photos": [
+      "/assets/images/property-2/living-room.jpg",
+      "/assets/images/property-2/living-room-2.jpg"
+    ],
     "coordinates": {
       "x": 111,
       "y": 670,
@@ -131,7 +149,10 @@
       "Island with seating",
       "Designer lighting fixtures"
     ],
-    "photos": ["/assets/images/property-2/kitchen.jpg"],
+    "photos": [
+      "/assets/images/property-2/kitchen.jpg",
+      "/assets/images/property-2/kitchen-2.jpg"
+    ],
     "coordinates": {
       "x": 112,
       "y": 328,
@@ -151,7 +172,10 @@
       "Accent lighting",
       "Blackout window treatments"
     ],
-    "photos": ["/assets/images/property-2/master-bedroom.jpg"],
+    "photos": [
+      "/assets/images/property-2/master-bedroom.jpg",
+      "/assets/images/property-2/master-bedroom-2.jpg"
+    ],
     "coordinates": {
       "x": 324,
       "y": 28,
@@ -171,7 +195,10 @@
       "Neutral color palette",
       "Plush carpeting"
     ],
-    "photos": ["/assets/images/property-2/bedroom-2.jpg"],
+    "photos": [
+      "/assets/images/property-2/bedroom-2.jpg",
+      "/assets/images/property-2/bedroom-2-alt.jpg"
+    ],
     "coordinates": {
       "x": 400,
       "y": 340,
@@ -191,7 +218,10 @@
       "Natural light",
       "Durable flooring"
     ],
-    "photos": ["/assets/images/property-2/bedroom-3.jpg"],
+    "photos": [
+      "/assets/images/property-2/bedroom-3.jpg",
+      "/assets/images/property-2/bedroom-3-alt.jpg"
+    ],
     "coordinates": {
       "x": 424,
       "y": 720,
@@ -211,7 +241,10 @@
       "Heated floors",
       "Designer fixtures"
     ],
-    "photos": ["/assets/images/property-2/master-bathroom.jpg"],
+    "photos": [
+      "/assets/images/property-2/master-bathroom.jpg",
+      "/assets/images/property-2/master-bathroom-2.jpg"
+    ],
     "coordinates": {
       "x": 107,
       "y": 29,
@@ -231,7 +264,10 @@
       "Modern fixtures",
       "Efficient storage"
     ],
-    "photos": ["/assets/images/property-2/bathroom-2.jpg"],
+    "photos": [
+      "/assets/images/property-2/bathroom-2.jpg",
+      "/assets/images/property-2/bathroom-2-alt.jpg"
+    ],
     "coordinates": {
       "x": 518,
       "y": 580,
@@ -251,7 +287,10 @@
       "Built-in planters",
       "Exterior lighting"
     ],
-    "photos": ["/assets/images/property-2/balcony.jpg"],
+    "photos": [
+      "/assets/images/property-2/balcony.jpg",
+      "/assets/images/property-2/balcony-2.jpg"
+    ],
     "coordinates": {
       "x": 104,
       "y": 958,

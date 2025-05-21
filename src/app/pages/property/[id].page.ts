@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
-import { CommonModule, NgClass } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { PropertyService } from '../../services/property.service';
@@ -9,6 +9,8 @@ import { Room } from '../../models/room.model';
 import { PropertyStatsComponent } from '../../components/property-stats.component';
 import { FloorPlanComponent } from '../../components/floor-plan.component';
 import { RoomDetailsComponent } from '../../components/room-details.component';
+import { ContactModalComponent } from '../../components/contact-modal.component';
+import { ScheduleViewingModalComponent } from '../../components/schedule-viewing-modal.component';
 import { NgIcon } from '@ng-icons/core';
 
 @Component({
@@ -16,10 +18,11 @@ import { NgIcon } from '@ng-icons/core';
   standalone: true,
   imports: [
     CommonModule,
-    NgClass,
     PropertyStatsComponent,
     FloorPlanComponent,
     RoomDetailsComponent,
+    ContactModalComponent,
+    ScheduleViewingModalComponent,
     RouterLink,
     NgIcon
   ],
@@ -87,11 +90,17 @@ import { NgIcon } from '@ng-icons/core';
           <h2 class="text-2xl font-medium text-dark-text dark:text-white mb-4">Interested in this property?</h2>
           <p class="text-light-text dark:text-gray-300 max-w-2xl mx-auto mb-6">Schedule a viewing or get more information about this property by contacting our agents.</p>
           <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <button class="text-white px-6 py-3 rounded-lg flex items-center justify-center transition-opacity" [ngClass]="{'bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary': true}">
+            <button
+              class="text-white px-6 py-3 rounded-lg flex items-center justify-center transition-opacity bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary"
+              (click)="openContactAgentModal()"
+            >
               <ng-icon name="tablerPhone" class="mr-2 text-2xl"></ng-icon>
               Contact Agent
             </button>
-            <button class="border border-primary text-white dark:text-white px-6 py-3 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors">
+            <button
+              class="border border-primary text-primary dark:text-primary px-6 py-3 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-colors"
+              (click)="openScheduleViewingModal()"
+            >
               <ng-icon name="tablerCalendarEvent" class="mr-2 text-2xl"></ng-icon>
               Schedule Viewing
             </button>
@@ -104,11 +113,26 @@ import { NgIcon } from '@ng-icons/core';
       <ng-icon name="tablerMoodSad" class="h-16 w-16 mx-auto text-gray-300 mb-4"></ng-icon>
       <h2 class="text-2xl font-medium text-dark-text dark:text-white mb-4">Property Not Found</h2>
       <p class="text-light-text dark:text-gray-300 mb-8">The property you're looking for doesn't exist or has been removed.</p>
-      <a routerLink="/" class="text-white px-6 py-3 rounded-lg inline-flex items-center transition-opacity" [ngClass]="{'bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary': true}">
+      <a routerLink="/" class="text-white px-6 py-3 rounded-lg inline-flex items-center transition-opacity bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary">
         <ng-icon name="tablerChevronLeft" class="mr-2"></ng-icon>
         Back to Home
       </a>
     </div>
+    <!-- Contact Agent Modal -->
+    <app-contact-modal
+      [isOpen]="contactAgentModalOpen()"
+      [contactType]="'agent'"
+      [propertyId]="property?.id"
+      [propertyTitle]="property?.title"
+      (closed)="closeContactAgentModal()"
+    ></app-contact-modal>
+    <!-- Schedule Viewing Modal -->
+    <app-schedule-viewing-modal
+      [isOpen]="scheduleViewingModalOpen()"
+      [propertyId]="property?.id || ''"
+      [propertyTitle]="property?.title"
+      (closed)="closeScheduleViewingModal()"
+    ></app-schedule-viewing-modal>
   `
 })
 export default class PropertyDetailPage implements OnInit {
@@ -116,6 +140,10 @@ export default class PropertyDetailPage implements OnInit {
   rooms: Room[] = [];
   selectedRoomId = signal('');
   isLoading: boolean = true;
+
+  // Private modal state signals
+  private _contactAgentModalOpen = signal(false);
+  private _scheduleViewingModalOpen = signal(false);
 
   constructor(
     private route: ActivatedRoute,
@@ -167,4 +195,24 @@ export default class PropertyDetailPage implements OnInit {
     this.selectedRoomId.set(roomId);
     this.cdr.detectChanges();
   }
+
+  openContactAgentModal(): void {
+    this._contactAgentModalOpen.set(true);
+  }
+
+  closeContactAgentModal(): void {
+    this._contactAgentModalOpen.set(false);
+  }
+
+  openScheduleViewingModal(): void {
+    this._scheduleViewingModalOpen.set(true);
+  }
+
+  closeScheduleViewingModal(): void {
+    this._scheduleViewingModalOpen.set(false);
+  }
+
+  // Public readonly properties for template access
+  contactAgentModalOpen = this._contactAgentModalOpen.asReadonly();
+  scheduleViewingModalOpen = this._scheduleViewingModalOpen.asReadonly();
 }

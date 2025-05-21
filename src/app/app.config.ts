@@ -25,7 +25,14 @@ import {
   tablerSearch,
   tablerInfoCircle,
   tablerMoodSad,
-  tablerAlertCircle
+  tablerAlertCircle,
+  tablerX,
+  tablerZoomIn,
+  tablerZoomOut,
+  tablerChevronUp,
+  tablerChevronDown,
+  tablerEye,
+  tablerCamera
 } from '@ng-icons/tabler-icons';
 
 export const appConfig: ApplicationConfig = {
@@ -37,7 +44,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([requestContextInterceptor])
     ),
     provideClientHydration(),
-    // Provide all icons for the application
     provideIcons({
       tablerHome,
       tablerBed,
@@ -56,7 +62,14 @@ export const appConfig: ApplicationConfig = {
       tablerSearch,
       tablerInfoCircle,
       tablerMoodSad,
-      tablerAlertCircle
+      tablerAlertCircle,
+      tablerX,
+      tablerZoomIn,
+      tablerZoomOut,
+      tablerChevronUp,
+      tablerChevronDown,
+      tablerEye,
+      tablerCamera
     })
   ],
 };

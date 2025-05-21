@@ -3,18 +3,31 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../services/theme.service';
 import { NgIcon } from '@ng-icons/core';
+import { ContactModalComponent } from './contact-modal.component';
+import { GenericModalComponent } from './generic-modal.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, NgIcon],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    CommonModule,
+    NgIcon,
+    ContactModalComponent,
+    GenericModalComponent,
+  ],
   template: `
     <!-- Header -->
     <header class="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50">
       <div
         class="container mx-auto px-4 py-3 flex justify-between items-center"
       >
-        <a routerLink="/" class="flex flex-row justify-start items-start relative">
+        <a
+          routerLink="/"
+          class="flex flex-row justify-start items-start relative"
+        >
           <svg
             width="150"
             height="42"
@@ -65,11 +78,14 @@ import { NgIcon } from '@ng-icons/core';
               </g>
             </g>
           </svg>
-          <span class="ml-2 text-lg tracking-[0.4em] font-light text-dark-text dark:text-white absolute top-5 left-10">Spaces</span>
+          <span
+            class="ml-2 text-lg tracking-[0.4em] font-light text-dark-text dark:text-white absolute top-5 left-10"
+            >Spaces</span
+          >
         </a>
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center">
-          <ul class="flex space-x-8">
+          <ul class="flex items-center space-x-8">
             <li>
               <a
                 routerLink="/"
@@ -89,52 +105,74 @@ import { NgIcon } from '@ng-icons/core';
               </a>
             </li>
             <li>
-              <a
-                href="#"
-                class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+              <button
+                (click)="openContactModal()"
+                class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0"
               >
                 Contact
-              </a>
+              </button>
             </li>
           </ul>
-          <!-- Dark mode toggle -->
+          <!-- Improved Dark mode toggle -->
           <div class="ml-8 flex items-center">
             <button
-              class="flex items-center bg-gray-200 dark:bg-gray-600 rounded-full px-1 py-1 w-14 h-7 transition-colors duration-300"
+              class="relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+              [class]="
+                isDarkMode() ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
+              "
               (click)="toggleTheme()"
+              [attr.aria-label]="
+                isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'
+              "
             >
-              <div class="flex justify-between items-center w-full px-1">
-                <!-- Sun icon for light mode -->
+              <!-- Toggle Circle with Icon -->
+              <span
+                class="flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 items-center justify-center"
+                [class]="isDarkMode() ? 'translate-x-9' : 'translate-x-1'"
+              >
+                <!-- Sun Icon (visible in light mode) -->
                 <ng-icon
                   name="tablerSun"
-                  class="h-4 w-4 text-white"
+                  class="h-4 w-4 text-yellow-500 transition-opacity duration-200"
+                  [class.opacity-100]="!isDarkMode()"
+                  [class.opacity-0]="isDarkMode()"
                 ></ng-icon>
-
-                <!-- Moon icon for dark mode -->
+                <!-- Moon Icon (visible in dark mode) -->
                 <ng-icon
                   name="tablerMoon"
-                  class="h-4 w-4 text-white"
+                  class="h-4 w-4 text-blue-600 absolute transition-opacity duration-200"
+                  [class.opacity-100]="isDarkMode()"
+                  [class.opacity-0]="!isDarkMode()"
                 ></ng-icon>
-
-                <!-- Toggle indicator -->
-                <div
-                  class="bg-white dark:bg-dark-background rounded-full h-5 w-5 transform transition-transform duration-300"
-                  [ngClass]="{'translate-x-7': isDarkMode()}"
-                ></div>
-              </div>
+              </span>
+              <!-- Background Icons -->
+              <span
+                class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-2 rounded-full"
+              >
+                <ng-icon
+                  name="tablerSun"
+                  class="h-4 w-4 text-white transition-opacity duration-200"
+                  [class.opacity-100]="!isDarkMode()"
+                  [class.opacity-0]="isDarkMode()"
+                ></ng-icon>
+                <ng-icon
+                  name="tablerMoon"
+                  class="h-4 w-4 text-white transition-opacity duration-200"
+                  [class.opacity-100]="isDarkMode()"
+                  [class.opacity-0]="!isDarkMode()"
+                ></ng-icon>
+              </span>
             </button>
           </div>
         </nav>
-
         <!-- Mobile menu button -->
         <button
-          class="md:hidden flex items-center ext-white"
+          class="md:hidden flex items-center text-dark-text dark:text-white bg-transparent border-none p-2"
           (click)="toggleMobileMenu()"
         >
           <ng-icon name="tablerMenu2" class="h-6 w-6"></ng-icon>
         </button>
       </div>
-
       <!-- Mobile Navigation Menu -->
       <div
         *ngIf="isMobileMenuOpen()"
@@ -162,40 +200,55 @@ import { NgIcon } from '@ng-icons/core';
             </a>
           </li>
           <li>
-            <a
-              href="#"
-              class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
-              (click)="closeMobileMenu()"
+            <button
+              (click)="openContactModal(); closeMobileMenu()"
+              class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0 text-left"
             >
               Contact
-            </a>
+            </button>
           </li>
           <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
               <span class="text-light-text dark:text-gray-300">Dark Mode</span>
+              <!-- Mobile Dark Mode Toggle -->
               <button
-                class="flex items-center bg-gray-200 dark:bg-gray-600 rounded-full px-1 py-1 w-14 h-7 transition-colors duration-300"
+                class="relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                [class]="isDarkMode() ? 'bg-primary' : 'bg-gray-300'"
                 (click)="toggleTheme()"
               >
-                <div class="flex justify-between items-center w-full px-1">
-                  <!-- Sun icon -->
+                <span
+                  class="flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 items-center justify-center"
+                  [class]="isDarkMode() ? 'translate-x-9' : 'translate-x-1'"
+                >
                   <ng-icon
                     name="tablerSun"
-                    class="h-4 w-4 text-yellow-500"
+                    class="h-4 w-4 text-yellow-500 transition-opacity duration-200"
+                    [class.opacity-100]="!isDarkMode()"
+                    [class.opacity-0]="isDarkMode()"
                   ></ng-icon>
-
-                  <!-- Moon icon -->
                   <ng-icon
                     name="tablerMoon"
-                    class="h-4 w-4 text-indigo-200"
+                    class="h-4 w-4 text-blue-600 absolute transition-opacity duration-200"
+                    [class.opacity-100]="isDarkMode()"
+                    [class.opacity-0]="!isDarkMode()"
                   ></ng-icon>
-
-                  <!-- Toggle indicator -->
-                  <div
-                    class="bg-white dark:bg-dark-background rounded-full h-5 w-5 transform transition-transform duration-300"
-                    [ngClass]="{'translate-x-7': isDarkMode()}"
-                  ></div>
-                </div>
+                </span>
+                <span
+                  class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-2"
+                >
+                  <ng-icon
+                    name="tablerSun"
+                    class="h-4 w-4 text-white transition-opacity duration-200"
+                    [class.opacity-100]="!isDarkMode()"
+                    [class.opacity-0]="isDarkMode()"
+                  ></ng-icon>
+                  <ng-icon
+                    name="tablerMoon"
+                    class="h-4 w-4 text-white transition-opacity duration-200"
+                    [class.opacity-100]="isDarkMode()"
+                    [class.opacity-0]="!isDarkMode()"
+                  ></ng-icon>
+                </span>
               </button>
             </div>
           </li>
@@ -221,18 +274,52 @@ import { NgIcon } from '@ng-icons/core';
           <div
             class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-8"
           >
-            <a href="#" class="text-gray-300 hover:text-white transition-colors"
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition-colors"
+              (click)="
+                openGenericModal(
+                  'About Us',
+                  'Learn more about Fresh Projects Spaces and our mission to help you find the perfect home. We are a team of experienced real estate professionals dedicated to providing exceptional service.'
+                )
+              "
+              class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
               >About Us</a
             >
-            <a href="#" class="text-gray-300 hover:text-white transition-colors"
-              >Terms of Service</a
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition-colors"
+              (click)="
+                openGenericModal(
+                  'Terms of Service',
+                  'Our terms of service will be displayed here. This includes all the legal information about using our platform, user responsibilities, and service limitations.'
+                )
+              "
+              class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
             >
-            <a href="#" class="text-gray-300 hover:text-white transition-colors"
-              >Privacy Policy</a
+              Terms of Service
+            </a>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition-colors"
+              (click)="
+                openGenericModal(
+                  'Privacy Policy',
+                  'Our privacy policy details how we collect, use, and protect your personal information. We are committed to maintaining your privacy and data security.'
+                )
+              "
+              class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
             >
-            <a href="#" class="text-gray-300 hover:text-white transition-colors"
-              >Contact</a
+              Privacy Policy
+            </a>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition-colors"
+              (click)="openContactModal()"
+              class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
             >
+              Contact
+            </a>
           </div>
         </div>
         <div
@@ -244,41 +331,76 @@ import { NgIcon } from '@ng-icons/core';
         </div>
       </div>
     </footer>
+    <!-- Contact Modal -->
+    <app-contact-modal
+      [isOpen]="contactModalOpen()"
+      [contactType]="contactModalType()"
+      (closed)="closeContactModal()"
+    ></app-contact-modal>
+    <!-- Generic Modal -->
+    <app-generic-modal
+      [isOpen]="genericModalOpen()"
+      [title]="genericModalTitle()"
+      [content]="genericModalContent()"
+      (closed)="closeGenericModal()"
+    ></app-generic-modal>
   `,
 })
 export class LayoutComponent implements OnInit {
-  // Signal to track mobile menu state
-  private mobileMenuOpen = signal(false);
-
-  // Reference to the theme service
+  private _mobileMenuOpen = signal(false);
   private themeService = inject(ThemeService);
+  private _contactModalOpen = signal(false);
+  private _contactModalType = signal<'general' | 'agent'>('general');
+  private _genericModalOpen = signal(false);
+  private _genericModalTitle = signal('');
+  private _genericModalContent = signal('');
 
-  ngOnInit() {
-    // Any initialization needed
-  }
+  ngOnInit() {}
 
-  // Expose dark mode state
   isDarkMode() {
     return this.themeService.darkMode;
   }
 
-  // Toggle dark mode
   toggleTheme() {
     this.themeService.toggleTheme();
   }
 
-  // Expose signal state as a method
   isMobileMenuOpen() {
-    return this.mobileMenuOpen();
+    return this._mobileMenuOpen();
   }
 
-  // Toggle mobile menu
   toggleMobileMenu() {
-    this.mobileMenuOpen.update(value => !value);
+    this._mobileMenuOpen.update((value) => !value);
   }
 
-  // Close mobile menu
   closeMobileMenu() {
-    this.mobileMenuOpen.set(false);
+    this._mobileMenuOpen.set(false);
   }
+
+  // Contact Modal Methods
+  openContactModal(type: 'general' | 'agent' = 'general') {
+    this._contactModalType.set(type);
+    this._contactModalOpen.set(true);
+  }
+
+  closeContactModal() {
+    this._contactModalOpen.set(false);
+  }
+
+  openGenericModal(title: string, content: string) {
+    this._genericModalTitle.set(title);
+    this._genericModalContent.set(content);
+    this._genericModalOpen.set(true);
+  }
+
+  closeGenericModal() {
+    this._genericModalOpen.set(false);
+  }
+
+  // Public readonly properties for template access
+  contactModalOpen = this._contactModalOpen.asReadonly();
+  contactModalType = this._contactModalType.asReadonly();
+  genericModalOpen = this._genericModalOpen.asReadonly();
+  genericModalTitle = this._genericModalTitle.asReadonly();
+  genericModalContent = this._genericModalContent.asReadonly();
 }

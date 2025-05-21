@@ -147,9 +147,9 @@ Please ask any clarifying questions you may have and then proceed with the above
 
 ---
 
-
-I've updated the repomix file in project knowledge.
-
+okay we have the main floorplan functional and works with responsive sizes after alot of trial and error. I made many UI tweaks to bring stability to styling. Im super overdue on this project due to both work and family emergencies, its unfortunate but lets at least submit something amazing.
+I've updated the repomix file in project knowledge and included the json server data as well this time.
+In this chat I will lay out what I believe will elevate the current project over the line and good enough to submit late and save some pride.
 
 - Dark Mode Toggle UI: the dark mode toggle in src/app/components/layout.component.ts works to change the theme but just looks like a button - somehow the icons are not visble  and it really looks like a button - please help me make it look like a switch with the sun and moon icons visible and centered in the toggle - as users have come to expect of theme toggles
 
