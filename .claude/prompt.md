@@ -144,15 +144,21 @@ Please ask any clarifying questions you may have and then proceed with the above
 
 
 - Floor plan interactivity: I've reworked the floorplan selection layer on the server data side and the percentage function client side and make the lables only visible on selection or hover and look like a button so that the label doesnt visual conflict with the room names contained in the floorpan image - now I with the floorplan implemeted, I feel the unselected, selected and hover states of the room floor plan areas could have more impact and more diverse colors for each state enhancing user experience
-  
-- contact aggent, schedule viewing, footer links and header contact button must open modal components on oress - the contact in the header should open a modal for a general contact us form that when submitted calls an analog endpoint to save the contact request to json on server - same goes for contact agent - for shedule viewing lets make a cool form with a calendar shedule component, or even a regular calendar from https://spartan.ng/components/calendar
+
+---
+
+
+I've updated the repomix file in project knowledge.
+
+
+- Dark Mode Toggle UI: the dark mode toggle in src/app/components/layout.component.ts works to change the theme but just looks like a button - somehow the icons are not visble  and it really looks like a button - please help me make it look like a switch with the sun and moon icons visible and centered in the toggle - as users have come to expect of theme toggles
+
+- contact agent, schedule viewing, footer links and header contact button must open modal components on oress - the contact in the header should open a modal for a general contact us form that when submitted calls an analog endpoint to save the contact request to json on server - same goes for contact agent - for shedule viewing lets make a cool form with a calendar shedule component, or even a regular calendar from 
 
 - The footer links should trigger a standard modal with place holder text and the contact in the footer should open the generic contact modal form
 
 - For room details we currently only have 1 photo for most rooms - update the rooms.json data on the server to accomodate at less 2 images per room and Ill add the content
 
 - the photos displayed in the src/app/components/room-details.component.ts file, should be lazy loaded for high res but load the low res when server rendered - adding a zoomable modal gallery view when clicking an image would be a great touch
-
-Naturally we dont want to implement all these improvements in 1 chat, but I would like to get as much as possible done in this chat to get the project to a good state to submit
 
 Please ask any clarifying questions you may have and then proceed with the above.
