@@ -52,13 +52,13 @@ import { Room } from '../models/room.model';
             'border-[#74BA43]/30': activeRoomSignal() !== room.id,
             'hover:border-2': activeRoomSignal() !== room.id
           }"
-          class="absolute cursor-pointer group p-3 transition-all duration-200 border rounded-md  flex flex-col items-start justify-start z-50"
+          class="absolute cursor-pointer group p-1 transition-all duration-200 border rounded-md  flex flex-col items-start justify-start z-50"
           (click)="selectRoom(room.id)"
         >
           <!-- Integrated Room Label -->
           <div
-            class="px-2 py-1 opacity-0 group-hover:opacity-100 rounded-full text-xs te font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start"
-            [ngClass]="{ 'bg-white': activeRoomSignal() === room.id, 'opacity-100':activeRoomSignal() === room.id, }"
+            class="px-2 py-1 opacity-0 group-hover:opacity-100 bg-white rounded-full text-xs text-left flex-nowrap whitespace-nowrap font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start"
+            [ngClass]="{  'opacity-100':activeRoomSignal() === room.id, }"
           >
             {{ room.name }}
           </div>
@@ -130,17 +130,27 @@ export class FloorPlanComponent implements OnChanges {
 
   getPercentPosition(pixelValue: number, isHorizontal: boolean): number {
     // const reference = isHorizontal ? this.referenceWidth : this.referenceHeight;
-    const reference = isHorizontal
-      ? this.referenceWidth * 1.45
-      : this.referenceHeight * 1.3;
+    const reference =
+      this.orientation === 'horizontal'
+        ? isHorizontal
+          ? this.referenceWidth
+          : this.referenceHeight
+        : isHorizontal
+        ? this.referenceWidth * 1.45
+        : this.referenceHeight * 1.3;
 
     return (pixelValue / reference) * 100;
   }
 
   getPercentSize(pixelValue: number, isHorizontal: boolean): number {
-    const reference = isHorizontal
-      ? this.referenceWidth * 1.45
-      : this.referenceHeight * 1.7;
+    const reference =
+      this.orientation === 'horizontal'
+        ? isHorizontal
+          ? this.referenceWidth
+          : this.referenceHeight
+        : isHorizontal
+        ? this.referenceWidth * 1.45
+        : this.referenceHeight * 1.5;
     // const reference =  this.referenceWidth + this.referenceHeight;
     return (pixelValue / reference) * 100;
   }

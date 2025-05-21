@@ -13,10 +13,10 @@
     ],
     "photos": ["/assets/images/property-1/living-room.jpg"],
     "coordinates": {
-      "x": 127,
-      "y": 287,
-      "width": 419,
-      "height": 223
+      "x": 232,
+      "y": 285,
+      "width": 533,
+      "height": 298
     }
   },
   {
@@ -33,10 +33,10 @@
     ],
     "photos": ["/assets/images/property-1/bedroom.jpg"],
     "coordinates": {
-      "x": 319,
-      "y": 67,
-      "width": 227,
-      "height": 190
+      "x": 230,
+      "y": 44,
+      "width": 416,
+      "height": 215
     }
   },
   {
@@ -53,10 +53,10 @@
     ],
     "photos": ["/assets/images/property-1/kitchen.jpg"],
     "coordinates": {
-      "x": 127,
-      "y": 420,
-      "width": 99,
-      "height": 109
+      "x": 58,
+      "y": 396,
+      "width": 171,
+      "height": 184
     }
   },
   {
@@ -73,10 +73,10 @@
     ],
     "photos": ["/assets/images/property-1/bathroom.jpg"],
     "coordinates": {
-      "x": 88,
-      "y": 67,
-      "width": 141,
-      "height": 190
+      "x": 73,
+      "y": 36,
+      "width": 150,
+      "height": 230
     }
   },
   {
@@ -93,10 +93,10 @@
     ],
     "photos": ["/assets/images/property-1/balcony.jpg"],
     "coordinates": {
-      "x": 656,
-      "y": 67,
-      "width": 84,
-      "height": 190
+      "x": 670,
+      "y": 36,
+      "width": 116,
+      "height": 230
     }
   },
   {
@@ -114,7 +114,7 @@
     "photos": ["/assets/images/property-2/living-room.jpg"],
     "coordinates": {
       "x": 111,
-      "y": 600,
+      "y": 670,
       "width": 300,
       "height": 333
     }
@@ -134,9 +134,9 @@
     "photos": ["/assets/images/property-2/kitchen.jpg"],
     "coordinates": {
       "x": 112,
-      "y": 280,
+      "y": 328,
       "width": 195,
-      "height": 422
+      "height": 385
     }
   },
   {
@@ -153,10 +153,10 @@
     ],
     "photos": ["/assets/images/property-2/master-bedroom.jpg"],
     "coordinates": {
-      "x": 327,
-      "y": 29,
-      "width": 374,
-      "height": 349
+      "x": 324,
+      "y": 28,
+      "width": 373,
+      "height": 345
     }
   },
   {
@@ -174,9 +174,9 @@
     "photos": ["/assets/images/property-2/bedroom-2.jpg"],
     "coordinates": {
       "x": 400,
-      "y": 305,
-      "width": 301,
-      "height": 273
+      "y": 340,
+      "width": 300,
+      "height": 270
     }
   },
   {
@@ -193,8 +193,8 @@
     ],
     "photos": ["/assets/images/property-2/bedroom-3.jpg"],
     "coordinates": {
-      "x": 428,
-      "y": 640,
+      "x": 424,
+      "y": 720,
       "width": 269,
       "height": 334
     }
@@ -214,9 +214,9 @@
     "photos": ["/assets/images/property-2/master-bathroom.jpg"],
     "coordinates": {
       "x": 107,
-      "y": 25,
+      "y": 29,
       "width": 202,
-      "height": 245
+      "height": 238
     }
   },
   {
@@ -233,8 +233,8 @@
     ],
     "photos": ["/assets/images/property-2/bathroom-2.jpg"],
     "coordinates": {
-      "x": 520,
-      "y": 520,
+      "x": 518,
+      "y": 580,
       "width": 177,
       "height": 138
     }
@@ -254,7 +254,7 @@
     "photos": ["/assets/images/property-2/balcony.jpg"],
     "coordinates": {
       "x": 104,
-      "y": 855,
+      "y": 958,
       "width": 302,
       "height": 92
     }
