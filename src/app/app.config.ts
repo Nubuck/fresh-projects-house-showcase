@@ -6,6 +6,27 @@ import {
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
+import { provideIcons } from '@ng-icons/core';
+import {
+  tablerHome,
+  tablerBed,
+  tablerBath,
+  tablerMaximize,
+  tablerBuildingCommunity,
+  tablerMapPin,
+  tablerPhone,
+  tablerCalendarEvent,
+  tablerChevronRight,
+  tablerChevronLeft,
+  tablerSun,
+  tablerMoon,
+  tablerMenu2,
+  tablerCheck,
+  tablerSearch,
+  tablerInfoCircle,
+  tablerMoodSad,
+  tablerAlertCircle
+} from '@ng-icons/tabler-icons';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,5 +37,26 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([requestContextInterceptor])
     ),
     provideClientHydration(),
+    // Provide all icons for the application
+    provideIcons({
+      tablerHome,
+      tablerBed,
+      tablerBath,
+      tablerMaximize,
+      tablerBuildingCommunity,
+      tablerMapPin,
+      tablerPhone,
+      tablerCalendarEvent,
+      tablerChevronRight,
+      tablerChevronLeft,
+      tablerSun,
+      tablerMoon,
+      tablerMenu2,
+      tablerCheck,
+      tablerSearch,
+      tablerInfoCircle,
+      tablerMoodSad,
+      tablerAlertCircle
+    })
   ],
 };

@@ -1,65 +1,75 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { PropertyCardComponent } from '../components/property-card.component';
 import { PropertyService } from '../services/property.service';
 import { Property } from '../models/property.model';
+import { FormsModule } from '@angular/forms';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, NgClass, PropertyCardComponent],
+  imports: [CommonModule, NgClass, PropertyCardComponent, FormsModule, NgIcon],
   template: `
-    <div class="bg-light-background py-16">
+    <div class="bg-light-background dark:bg-gray-800 py-16">
       <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-          <h1 class="text-4xl md:text-5xl font-medium text-dark-text mb-4">Fresh Projects Spaces</h1>
-          <p class="text-light-text text-xl max-w-3xl mx-auto">Find your perfect home with our interactive property listings</p>
+          <h1 class="text-4xl md:text-5xl font-medium text-dark-text dark:text-white mb-4">Fresh Projects Spaces</h1>
+          <p class="text-light-text dark:text-gray-300 text-xl max-w-3xl mx-auto">Find your perfect home with our interactive property listings</p>
         </div>
-
-        <!-- Search Box (Optional) -->
+        <!-- Search Box -->
         <div class="max-w-4xl mx-auto mb-12">
-          <div class="bg-white rounded-lg shadow-md p-4 flex items-center">
+          <div class="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4 flex items-center">
             <div class="relative flex-grow">
               <input
                 type="text"
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="performSearch()"
                 placeholder="Search properties by location, features..."
-                class="w-full pl-10 pr-4 py-3 rounded-md border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                class="w-full pl-10 pr-4 py-3 rounded-md border border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white dark:bg-gray-800 text-dark-text dark:text-white"
               >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <ng-icon
+                name="tablerSearch"
+                class="h-5 w-5 text-gray-400 dark:text-gray-300 absolute left-3 top-1/2 transform -translate-y-1/2"
+              ></ng-icon>
             </div>
-            <button class="ml-4 text-white px-6 py-3 rounded-md transition-opacity duration-200" [ngClass]="{'bg-primary hover:bg-primary/90': true}">
+            <button class="ml-4 text-white px-6 py-3 rounded-md transition-opacity duration-200" [ngClass]="{'bg-primary hover:bg-primary/90 dark:bg-primary/80 dark:hover:bg-primary': true}">
               Search
             </button>
           </div>
         </div>
       </div>
     </div>
-
     <div class="container mx-auto px-4 py-12">
       <!-- Featured Properties Heading -->
       <div class="mb-8">
-        <h2 class="text-3xl font-medium text-dark-text mb-2">Featured Properties</h2>
+        <h2 class="text-3xl font-medium text-dark-text dark:text-white mb-2">Featured Properties</h2>
         <div class="w-20 h-1 bg-primary rounded-full"></div>
       </div>
-
       <!-- Loading State -->
       <div *ngIf="loading" class="flex justify-center items-center py-16">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
-
       <!-- No Properties State -->
-      <div *ngIf="!loading && properties.length === 0" class="text-center py-16">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-        <p class="text-light-text text-lg">No properties available at the moment.</p>
+      <div *ngIf="!loading && filteredProperties().length === 0" class="text-center py-16">
+        <ng-icon
+          name="tablerHome"
+          class="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4"
+        ></ng-icon>
+        <p class="text-light-text dark:text-gray-300 text-lg">
+          {{ properties.length > 0 ? 'No properties match your search criteria.' : 'No properties available at the moment.' }}
+        </p>
+        <button
+          *ngIf="searchQuery && properties.length > 0"
+          (click)="clearSearch()"
+          class="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors duration-200"
+        >
+          Clear Search
+        </button>
       </div>
-
       <!-- Properties List -->
-      <div *ngIf="!loading && properties.length > 0">
-        <app-property-card *ngFor="let property of properties" [property]="property"></app-property-card>
+      <div *ngIf="!loading && filteredProperties().length > 0">
+        <app-property-card *ngFor="let property of filteredProperties()" [property]="property"></app-property-card>
       </div>
     </div>
   `
@@ -67,6 +77,9 @@ import { Property } from '../models/property.model';
 export default class HomePage implements OnInit {
   properties: Property[] = [];
   loading: boolean = true;
+  searchQuery: string = '';
+  private allProperties = signal<Property[]>([]);
+  filteredProperties = signal<Property[]>([]);
 
   constructor(private propertyService: PropertyService) {}
 
@@ -74,6 +87,8 @@ export default class HomePage implements OnInit {
     this.propertyService.getProperties().subscribe({
       next: (properties) => {
         this.properties = properties;
+        this.allProperties.set(properties);
+        this.filteredProperties.set(properties);
         this.loading = false;
       },
       error: (error) => {
@@ -81,5 +96,34 @@ export default class HomePage implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  performSearch(): void {
+    if (!this.searchQuery) {
+      this.filteredProperties.set(this.allProperties());
+      return;
+    }
+
+    const query = this.searchQuery.toLowerCase().trim();
+
+    const filtered = this.allProperties().filter(property => {
+      return (
+        property.title.toLowerCase().includes(query) ||
+        property.address.toLowerCase().includes(query) ||
+        property.description.toLowerCase().includes(query) ||
+        property.stats.type.toLowerCase().includes(query) ||
+        `${property.stats.bedrooms} bedroom`.includes(query) ||
+        `${property.stats.bathrooms} bathroom`.includes(query) ||
+        property.stats.area.toLowerCase().includes(query) ||
+        property.price.toLowerCase().includes(query)
+      );
+    });
+
+    this.filteredProperties.set(filtered);
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.filteredProperties.set(this.allProperties());
   }
 }

@@ -1,12 +1,7 @@
-/* Import the brand fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Raleway:wght@300;400;500;600&display=swap');
-
-/* src/styles.css */
 @import 'tailwindcss';
 
-
 :root {
-  /* Brand Colors */
   --color-primary: #74BA43;
   --color-success: #42758F;
   --color-warning: #EB6209;
@@ -14,12 +9,8 @@
   --color-light-background: #F0F5FF;
   --color-dark-text: #152542;
   --color-light-text: #3E547C;
-
-  /* Brand Fonts */
   --font-family-0: 'Raleway', sans-serif;
   --font-family-1: 'Inter', sans-serif;
-
-  /* Base styling */
   font-family: var(--font-family-1), Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
@@ -31,6 +22,24 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+/* This is the crucial part - explicitly prevent media query dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not(.dark) {
+    /* Override system dark mode preference when .dark is not present */
+    color-scheme: light;
+  }
+}
+
+/* Dark mode styles - apply ONLY when .dark class is present */
+.dark {
+  --color-light-background: #2e3440;
+  --color-dark-text: #e5e9f0;
+  --color-light-text: #d8dee9;
+  background-color: #1e2029;
+  color: #e5e9f0;
+  color-scheme: dark;
 }
 
 body {
@@ -97,7 +106,6 @@ button:focus-visible {
   outline: 4px auto var(--color-primary);
 }
 
-/* Custom utility classes */
 .bg-primary {
   background-color: var(--color-primary);
 }
@@ -140,4 +148,34 @@ button:focus-visible {
 
 .bg-light-background {
   background-color: var(--color-light-background);
+}
+
+/* Override for light mode */
+:root:not(.dark) .bg-white {
+  background-color: #ffffff !important;
+}
+
+/* Dark mode specific overrides with .dark class checks */
+.dark .bg-white {
+  background-color: #2e3440;
+}
+
+.dark .bg-light-background {
+  background-color: #3b4252;
+}
+
+.dark .text-dark-text {
+  color: #eceff4;
+}
+
+.dark .text-light-text {
+  color: #d8dee9;
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .border-gray-200 {
+  border-color: #4c566a;
 }

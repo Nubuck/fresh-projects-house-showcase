@@ -6,22 +6,28 @@ import {
   OnChanges,
   SimpleChanges,
   signal,
-  computed,
   inject,
   ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { Room } from '../models/room.model';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-floor-plan',
   standalone: true,
-  imports: [CommonModule, NgClass],
+  imports: [CommonModule, NgClass, NgIcon],
   template: `
     <div class="w-full">
-      <h3 class="text-xl font-medium text-dark-text mb-4">
+      <h3 class="text-xl font-medium text-dark-text dark:text-white mb-4">
         Interactive Floorplan
       </h3>
+      <div class="mb-6 px-4 py-3 bg-light-background dark:bg-gray-700 rounded-lg text-center">
+        <p class="text-sm text-light-text dark:text-gray-300 mb-0 flex items-center justify-center">
+          <ng-icon name="tablerInfoCircle" class="mr-2 text-primary"></ng-icon>
+          Click on a room to view detailed information and photos
+        </p>
+      </div>
       <div
         [class.floorplan-horizontal]="orientation === 'horizontal'"
         [class.floorplan-vertical]="orientation === 'vertical'"
@@ -31,11 +37,9 @@ import { Room } from '../models/room.model';
         <img
           [src]="floorplanImage"
           alt="Floorplan"
-          class="w-full border border-gray-200 rounded-lg"
+          class="w-full border border-gray-200 dark:border-gray-700 rounded-lg"
         />
-
         <!-- Clickable Room Areas with Integrated Labels -->
-
         <div
           *ngFor="let room of rooms"
           [style.left.%]="getPercentPosition(room.coordinates.x, true)"
@@ -52,37 +56,17 @@ import { Room } from '../models/room.model';
             'border-[#74BA43]/30': activeRoomSignal() !== room.id,
             'hover:border-2': activeRoomSignal() !== room.id
           }"
-          class="absolute cursor-pointer group p-1 transition-all duration-200 border rounded-md  flex flex-col items-start justify-start z-50"
+          class="absolute cursor-pointer group p-1 transition-all duration-200 border rounded-md flex flex-col items-start justify-start z-10"
           (click)="selectRoom(room.id)"
         >
           <!-- Integrated Room Label -->
           <div
-            class="px-2 py-1 opacity-0 group-hover:opacity-100 bg-white rounded-full text-xs text-left flex-nowrap whitespace-nowrap font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start"
+            class="px-2 py-1 opacity-0 group-hover:opacity-100 bg-white dark:bg-gray-800 rounded-full text-xs text-left flex-nowrap whitespace-nowrap font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start text-dark-text dark:text-white"
             [ngClass]="{  'opacity-100':activeRoomSignal() === room.id, }"
           >
             {{ room.name }}
           </div>
         </div>
-      </div>
-
-      <div class="mt-6 px-4 py-3 bg-light-background rounded-lg text-center">
-        <p class="text-sm text-light-text mb-0">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 inline-block mr-1 text-primary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Click on a room to view detailed information and photos
-        </p>
       </div>
     </div>
   `,
@@ -109,9 +93,7 @@ export class FloorPlanComponent implements OnChanges {
   @Input() floorplanImage: string = '';
   @Input() orientation: 'horizontal' | 'vertical' = 'horizontal';
   @Output() roomSelected = new EventEmitter<string>();
-
   activeRoomSignal = signal('');
-
   // Reference dimensions of the original floorplan images
   referenceWidth = 800;
   referenceHeight = 624;
@@ -122,14 +104,12 @@ export class FloorPlanComponent implements OnChanges {
       this.referenceWidth = this.orientation === 'horizontal' ? 800 : 550;
       this.referenceHeight = this.orientation === 'horizontal' ? 624 : 800;
     }
-
     if (changes['activeRoom']) {
       this.activeRoomSignal.set(this.activeRoom);
     }
   }
 
   getPercentPosition(pixelValue: number, isHorizontal: boolean): number {
-    // const reference = isHorizontal ? this.referenceWidth : this.referenceHeight;
     const reference =
       this.orientation === 'horizontal'
         ? isHorizontal
@@ -138,7 +118,6 @@ export class FloorPlanComponent implements OnChanges {
         : isHorizontal
         ? this.referenceWidth * 1.45
         : this.referenceHeight * 1.3;
-
     return (pixelValue / reference) * 100;
   }
 
@@ -151,7 +130,6 @@ export class FloorPlanComponent implements OnChanges {
         : isHorizontal
         ? this.referenceWidth * 1.45
         : this.referenceHeight * 1.5;
-    // const reference =  this.referenceWidth + this.referenceHeight;
     return (pixelValue / reference) * 100;
   }
 

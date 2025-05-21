@@ -1,9 +1,8 @@
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
   ],
+  darkMode: 'class', // Explicitly using class strategy, not media queries
   theme: {
     extend: {
       colors: {
@@ -35,5 +34,19 @@ module.exports = {
       }
     },
   },
+  // Adding core plugins to ensure proper dark mode behavior
+  corePlugins: {
+    preflight: true,
+    dark: true,
+  },
+  // Add a safelist for critical classes to ensure they're always generated
+  safelist: [
+    'bg-white',
+    'dark:bg-gray-900',
+    'dark:bg-gray-800',
+    'dark:bg-gray-700',
+    'text-dark-text',
+    'dark:text-white'
+  ],
   plugins: [],
 }

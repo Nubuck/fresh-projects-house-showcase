@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../services/theme.service';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, NgIcon],
   template: `
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50">
       <div
         class="container mx-auto px-4 py-3 flex justify-between items-center"
       >
@@ -63,8 +65,9 @@ import { CommonModule } from '@angular/common';
               </g>
             </g>
           </svg>
-          <span class="ml-2 text-xl font-medium text-dark-text">Spaces</span>
+          <span class="ml-2 text-xl font-medium text-dark-text dark:text-white">Spaces</span>
         </a>
+        <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center">
           <ul class="flex space-x-8">
             <li>
@@ -72,7 +75,7 @@ import { CommonModule } from '@angular/common';
                 routerLink="/"
                 routerLinkActive="text-primary font-medium"
                 [routerLinkActiveOptions]="{ exact: true }"
-                class="text-light-text hover:text-primary transition-colors duration-200"
+                class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
               >
                 Home
               </a>
@@ -80,7 +83,7 @@ import { CommonModule } from '@angular/common';
             <li>
               <a
                 routerLink="/"
-                class="text-light-text hover:text-primary transition-colors duration-200"
+                class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
               >
                 Listings
               </a>
@@ -88,49 +91,120 @@ import { CommonModule } from '@angular/common';
             <li>
               <a
                 href="#"
-                class="text-light-text hover:text-primary transition-colors duration-200"
+                class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
               >
                 Contact
               </a>
             </li>
           </ul>
-          <div class="ml-8 space-x-4">
+          <!-- Dark mode toggle -->
+          <div class="ml-8 flex items-center">
             <button
-              class="px-4 py-2 border border-primary text-white rounded-md hover:bg-primary hover:text-white transition-colors duration-200"
+              class="flex items-center bg-gray-200 dark:bg-gray-600 rounded-full px-1 py-1 w-14 h-7 transition-colors duration-300"
+              (click)="toggleTheme()"
             >
-              Sign In
-            </button>
-            <button
-              class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition-opacity duration-200"
-            >
-              Get Started
+              <div class="flex justify-between items-center w-full px-1">
+                <!-- Sun icon for light mode -->
+                <ng-icon
+                  name="tablerSun"
+                  class="h-4 w-4 text-yellow-500"
+                ></ng-icon>
+
+                <!-- Moon icon for dark mode -->
+                <ng-icon
+                  name="tablerMoon"
+                  class="h-4 w-4 text-indigo-200"
+                ></ng-icon>
+
+                <!-- Toggle indicator -->
+                <div
+                  class="bg-white dark:bg-dark-background rounded-full h-5 w-5 transform transition-transform duration-300"
+                  [ngClass]="{'translate-x-7': isDarkMode()}"
+                ></div>
+              </div>
             </button>
           </div>
         </nav>
+
         <!-- Mobile menu button -->
-        <button class="md:hidden flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 text-primary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+        <button
+          class="md:hidden flex items-center text-dark-text dark:text-white"
+          (click)="toggleMobileMenu()"
+        >
+          <ng-icon name="tablerMenu2" class="h-6 w-6"></ng-icon>
         </button>
       </div>
-    </header>
 
+      <!-- Mobile Navigation Menu -->
+      <div
+        *ngIf="isMobileMenuOpen()"
+        class="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-4 px-4 shadow-md"
+      >
+        <ul class="space-y-4">
+          <li>
+            <a
+              routerLink="/"
+              routerLinkActive="text-primary font-medium"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+              (click)="closeMobileMenu()"
+            >
+              Home
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="/"
+              class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+              (click)="closeMobileMenu()"
+            >
+              Listings
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+              (click)="closeMobileMenu()"
+            >
+              Contact
+            </a>
+          </li>
+          <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+              <span class="text-light-text dark:text-gray-300">Dark Mode</span>
+              <button
+                class="flex items-center bg-gray-200 dark:bg-gray-600 rounded-full px-1 py-1 w-14 h-7 transition-colors duration-300"
+                (click)="toggleTheme()"
+              >
+                <div class="flex justify-between items-center w-full px-1">
+                  <!-- Sun icon -->
+                  <ng-icon
+                    name="tablerSun"
+                    class="h-4 w-4 text-yellow-500"
+                  ></ng-icon>
+
+                  <!-- Moon icon -->
+                  <ng-icon
+                    name="tablerMoon"
+                    class="h-4 w-4 text-indigo-200"
+                  ></ng-icon>
+
+                  <!-- Toggle indicator -->
+                  <div
+                    class="bg-white dark:bg-dark-background rounded-full h-5 w-5 transform transition-transform duration-300"
+                    [ngClass]="{'translate-x-7': isDarkMode()}"
+                  ></div>
+                </div>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </header>
     <main class="min-h-screen">
       <router-outlet></router-outlet>
     </main>
-
     <!-- Footer -->
     <footer class="bg-dark-background text-white py-8 mt-12">
       <div class="container mx-auto px-4">
@@ -172,4 +246,39 @@ import { CommonModule } from '@angular/common';
     </footer>
   `,
 })
-export class LayoutComponent {}
+export class LayoutComponent implements OnInit {
+  // Signal to track mobile menu state
+  private mobileMenuOpen = signal(false);
+
+  // Reference to the theme service
+  private themeService = inject(ThemeService);
+
+  ngOnInit() {
+    // Any initialization needed
+  }
+
+  // Expose dark mode state
+  isDarkMode() {
+    return this.themeService.darkMode;
+  }
+
+  // Toggle dark mode
+  toggleTheme() {
+    this.themeService.toggleTheme();
+  }
+
+  // Expose signal state as a method
+  isMobileMenuOpen() {
+    return this.mobileMenuOpen();
+  }
+
+  // Toggle mobile menu
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update(value => !value);
+  }
+
+  // Close mobile menu
+  closeMobileMenu() {
+    this.mobileMenuOpen.set(false);
+  }
+}

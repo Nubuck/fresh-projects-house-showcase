@@ -120,3 +120,39 @@ For this chat I want to:
 - The Room images should be lazy loaded for high res but load the low res when server rendered. 
 
 
+---
+
+okay we have the main floorplan functional and works with responsive sizes after alot of trial and error. I made many UI tweaks to bring stability to styling. Im super overdue on this project due to both work and family emergencies, its unfortunate but lets at least submit something amazing.
+I've updated the repomix file in project knowledge and included the json server data as well this time.
+In this chat I will lay out what I believe will elevate the current project over the line and good enough to submit late and save some pride.
+
+- Mobile menu: at small to x small screens the header bar in src/app/components/layout.component.ts collapses down correctly but clicking the mobile nav button does not reveal the menu tray - please help implement this feature
+
+- Dark theme: also in src/app/components/layout.component.ts you'll notice I've commented out the sign in and get started buttons - they look cool but I dont want to ship too many fake features and neither of those buttons are in scope - instead I want to add a dark theme toggle that stores the selection in a cookie so that it also renders from the server in the users selected theme - theres a good guide here https://dev.to/this-is-angular/dark-mode-with-analog-tailwind-4049 also spartan has switch component we might be able to use here https://spartan.ng/components/switch
+
+- index page search: lets make the search work - it can just be client side a fuzzy filter on properties in memory unless you see a cool way to make it check the server as well, but not priority
+
+- icons: as cool as it is that you generated the pages with inline svg icons, it makes it difficult to adjust and would scare devs I think - dont get me wrong i think its cool but I think it would mre pragmatic to use something like https://ng-icons.github.io/ng-icons/#/ with tabler icons because it would make icon colors and sizing way easier for me, and swapping out icons would be easier
+
+- Indicator value font size: where we have the src/app/components/property-stats.component.ts and src/app/components/property-card.component.ts the stat icons and text size are way too small - its the main focus point we should make it stand out boldly - an icon pack above would help here
+
+Naturally we dont want to implement all these improvements in 1 chat, but I would like to get as much as possible done in this chat to get the project to a good state to submit
+
+Please ask any clarifying questions you may have and then proceed with the above.
+
+----
+
+
+- Floor plan interactivity: I've reworked the floorplan selection layer on the server data side and the percentage function client side and make the lables only visible on selection or hover and look like a button so that the label doesnt visual conflict with the room names contained in the floorpan image - now I with the floorplan implemeted, I feel the unselected, selected and hover states of the room floor plan areas could have more impact and more diverse colors for each state enhancing user experience
+  
+- contact aggent, schedule viewing, footer links and header contact button must open modal components on oress - the contact in the header should open a modal for a general contact us form that when submitted calls an analog endpoint to save the contact request to json on server - same goes for contact agent - for shedule viewing lets make a cool form with a calendar shedule component, or even a regular calendar from https://spartan.ng/components/calendar
+
+- The footer links should trigger a standard modal with place holder text and the contact in the footer should open the generic contact modal form
+
+- For room details we currently only have 1 photo for most rooms - update the rooms.json data on the server to accomodate at less 2 images per room and Ill add the content
+
+- the photos displayed in the src/app/components/room-details.component.ts file, should be lazy loaded for high res but load the low res when server rendered - adding a zoomable modal gallery view when clicking an image would be a great touch
+
+Naturally we dont want to implement all these improvements in 1 chat, but I would like to get as much as possible done in this chat to get the project to a good state to submit
+
+Please ask any clarifying questions you may have and then proceed with the above.
