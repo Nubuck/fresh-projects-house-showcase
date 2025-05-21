@@ -33,9 +33,7 @@ import { NgIcon } from '@ng-icons/core';
                 class="h-5 w-5 text-gray-400 dark:text-gray-300 absolute left-3 top-1/2 transform -translate-y-1/2"
               ></ng-icon>
             </div>
-            <button class="ml-4 text-white px-6 py-3 rounded-md transition-opacity duration-200" [ngClass]="{'bg-primary hover:bg-primary/90 dark:bg-primary/80 dark:hover:bg-primary': true}">
-              Search
-            </button>
+
           </div>
         </div>
       </div>

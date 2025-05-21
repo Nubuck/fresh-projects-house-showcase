@@ -69,6 +69,7 @@ src/app/pages/index.page.ts
 src/app/pages/property/[id].page.ts
 src/app/services/property.service.ts
 src/app/services/room.service.ts
+src/app/services/theme.service.ts
 src/main.server.ts
 src/main.ts
 src/server/data/properties.json
@@ -119,28 +120,6 @@ This section contains the contents of the repository's files.
 7: export const config = mergeApplicationConfig(appConfig, serverConfig);
 </file>
 
-<file path="src/app/app.config.ts">
- 1: import {
- 2:   provideHttpClient,
- 3:   withFetch,
- 4:   withInterceptors,
- 5: } from '@angular/common/http';
- 6: import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
- 7: import { provideClientHydration } from '@angular/platform-browser';
- 8: import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
- 9: export const appConfig: ApplicationConfig = {
-10:   providers: [
-11:     provideZoneChangeDetection({ eventCoalescing: true }),
-12:     provideFileRouter(),
-13:     provideHttpClient(
-14:       withFetch(),
-15:       withInterceptors([requestContextInterceptor])
-16:     ),
-17:     provideClientHydration(),
-18:   ],
-19: };
-</file>
-
 <file path="src/app/app.routes.ts">
  1: import { Routes } from '@angular/router';
  2: import { LayoutComponent } from './components/layout.component';
@@ -179,6 +158,66 @@ This section contains the contents of the repository's files.
 14:     return this.http.get<Property>(`/api/v1/properties/${id}`);
 15:   }
 16: }
+</file>
+
+<file path="src/app/services/theme.service.ts">
+ 1: import { Injectable, inject, PLATFORM_ID, signal, effect } from '@angular/core';
+ 2: import { isPlatformBrowser } from '@angular/common';
+ 3: @Injectable({
+ 4:   providedIn: 'root'
+ 5: })
+ 6: export class ThemeService {
+ 7:   private platformId = inject(PLATFORM_ID);
+ 8:   private THEME_KEY = 'fresh-projects-theme';
+ 9:   private _darkMode = signal(false);
+10:   private _useSystemPreference = signal(true);
+11:   constructor() {
+12:     this.initialize();
+13:     effect(() => {
+14:       this.applyTheme(this._darkMode());
+15:     });
+16:   }
+17:   get darkMode() {
+18:     return this._darkMode();
+19:   }
+20:   private initialize(): void {
+21:     if (isPlatformBrowser(this.platformId)) {
+22:       const storedTheme = localStorage.getItem(this.THEME_KEY);
+23:       if (storedTheme) {
+24:         this._useSystemPreference.set(false);
+25:         this._darkMode.set(storedTheme === 'dark');
+26:       } else {
+27:         this._useSystemPreference.set(true);
+28:         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+29:         this._darkMode.set(prefersDark);
+30:         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+31:           if (this._useSystemPreference()) {
+32:             this._darkMode.set(e.matches);
+33:           }
+34:         });
+35:       }
+36:       this.applyTheme(this._darkMode());
+37:     }
+38:   }
+39:   toggleTheme(): void {
+40:     this._useSystemPreference.set(false);
+41:     this._darkMode.update(current => !current);
+42:   }
+43:   private applyTheme(isDark: boolean): void {
+44:     if (isPlatformBrowser(this.platformId)) {
+45:       if (!this._useSystemPreference()) {
+46:         localStorage.setItem(this.THEME_KEY, isDark ? 'dark' : 'light');
+47:       }
+48:       if (isDark) {
+49:         document.documentElement.classList.add('dark');
+50:         document.documentElement.style.colorScheme = 'dark';
+51:       } else {
+52:         document.documentElement.classList.remove('dark');
+53:         document.documentElement.style.colorScheme = 'light';
+54:       }
+55:     }
+56:   }
+57: }
 </file>
 
 <file path="src/main.server.ts">
@@ -273,46 +312,6 @@ This section contains the contents of the repository's files.
 
 <file path="src/vite-env.d.ts">
 1: 
-</file>
-
-<file path="tailwind.config.js">
- 1: module.exports = {
- 2:   content: [
- 3:     "./src/**/*.{html,ts}",
- 4:   ],
- 5:   theme: {
- 6:     extend: {
- 7:       colors: {
- 8:         primary: '#74BA43',
- 9:         success: '#42758F',
-10:         warning: '#EB6209',
-11:         'dark-background': '#3D3D3C',
-12:         'light-background': '#F0F5FF',
-13:         'dark-text': '#152542',
-14:         'light-text': '#3E547C',
-15:         'custom-0': '#54565a',
-16:         'custom-1': '#f16022',
-17:         'custom-2': '#42758f',
-18:         'custom-3': '#f19b76',
-19:         'custom-4': '#FFFFFF',
-20:         'custom-5': '#91bd77',
-21:         'custom-6': '#F8F8F8',
-22:         'custom-7': '#777777',
-23:       },
-24:       fontFamily: {
-25:         raleway: ['Raleway', 'sans-serif'],
-26:         inter: ['Inter', 'sans-serif'],
-27:       },
-28:       boxShadow: {
-29:         'sm': '0px 1px 3px rgba(0, 0, 0, 0.12)',
-30:         'md': '0px 5px 20px -5px rgba(0, 0, 0, 0.15)',
-31:         'lg': '0px 10px 25px -8px rgba(0, 0, 0, 0.25)',
-32:         'xl': '0px 20px 40px -10px rgba(0, 0, 0, 0.25)',
-33:       }
-34:     },
-35:   },
-36:   plugins: [],
-37: }
 </file>
 
 <file path="tsconfig.app.json">
@@ -427,261 +426,67 @@ This section contains the contents of the repository's files.
 57: }
 </file>
 
-<file path="src/app/app.component.ts">
- 1: import { Component } from '@angular/core';
- 2: import { LayoutComponent } from './components/layout.component';
- 3: @Component({
- 4:   selector: 'app-root',
- 5:   standalone: true,
- 6:   imports: [LayoutComponent],
- 7:   template: `<app-layout></app-layout>`,
- 8:   styles: `
- 9:     :host {
-10:       max-width: 1280px;
-11:       margin: 0 auto;
-12:       text-align: center;
-13:     }
-14:   `,
-15: })
-16: export class AppComponent {}
-</file>
-
-<file path="src/app/components/property-card.component.ts">
- 1: import { Component, Input } from '@angular/core';
- 2: import { RouterLink } from '@angular/router';
- 3: import { Property } from '../models/property.model';
- 4: import { CommonModule, NgClass } from '@angular/common';
- 5: @Component({
- 6:   selector: 'app-property-card',
- 7:   standalone: true,
- 8:   imports: [RouterLink, CommonModule, NgClass],
- 9:   template: `
-10:     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 mb-6">
-11:       <div class="flex flex-col md:flex-row">
-12:         <!-- Property Image -->
-13:         <div class="md:w-2/5 h-64 md:h-auto relative">
-14:           <img [src]="property.thumbnail" [alt]="property.title" class="w-full h-full object-cover">
-15:           <div class="absolute top-4 right-4 bg-primary text-white px-2 py-1 rounded text-sm font-medium">
-16:             For Sale
-17:           </div>
-18:         </div>
-19:         <!-- Property Details -->
-20:         <div class="md:w-3/5 p-6 flex flex-col justify-between">
-21:           <div>
-22:             <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4">
-23:               <div>
-24:                 <h3 class="text-xl font-medium text-dark-text mb-1">{{ property.title }}</h3>
-25:                 <p class="text-light-text mb-2">{{ property.address }}</p>
-26:               </div>
-27:               <p class="text-primary font-medium text-xl md:text-right">{{ property.price }}</p>
-28:             </div>
-29:             <p class="text-light-text mb-4 line-clamp-3">
-30:               {{ property.description }}
-31:             </p>
-32:           </div>
-33:           <!-- Property Stats and CTA -->
-34:           <div class="mt-auto">
-35:             <div class="flex justify-between text-light-text text-sm mb-4">
-36:               <div class="flex items-center">
-37:                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-38:                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-39:                 </svg>
-40:                 <span>{{ property.stats.bedrooms }} Bed{{ property.stats.bedrooms !== 1 ? 's' : '' }}</span>
-41:               </div>
-42:               <div class="flex items-center">
-43:                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-44:                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-45:                 </svg>
-46:                 <span>{{ property.stats.bathrooms }} Bath{{ property.stats.bathrooms !== 1 ? 's' : '' }}</span>
-47:               </div>
-48:               <div class="flex items-center">
-49:                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-50:                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-51:                 </svg>
-52:                 <span>{{ property.stats.area }}</span>
-53:               </div>
-54:             </div>
-55:             <a [routerLink]="['/property', property.id]"
-56:                class="text-white px-4 py-2 rounded-lg inline-flex items-center transition-opacity duration-300" [ngClass]="{'bg-primary hover:bg-primary/90': true}">
-57:               <span>View Details</span>
-58:               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-59:                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-60:               </svg>
-61:             </a>
-62:           </div>
-63:         </div>
-64:       </div>
-65:     </div>
-66:   `
-67: })
-68: export class PropertyCardComponent {
-69:   @Input() property!: Property;
-70: }
-</file>
-
-<file path="src/app/components/property-stats.component.ts">
- 1: import { Component, Input } from '@angular/core';
- 2: import { CommonModule, NgClass } from '@angular/common';
- 3: import { Property } from '../models/property.model';
- 4: @Component({
- 5:   selector: 'app-property-stats',
- 6:   standalone: true,
- 7:   imports: [CommonModule, NgClass],
- 8:   template: `
- 9:     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-10:       <div class="bg-light-background rounded-lg p-5 text-center flex flex-col items-center">
-11:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10': true}">
-12:           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-13:             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-14:           </svg>
-15:         </div>
-16:         <h3 class="text-dark-text font-medium mb-1">Property Type</h3>
-17:         <p class="text-light-text">{{ property.stats.type }}</p>
-18:       </div>
-19:       <div class="bg-light-background rounded-lg p-5 text-center flex flex-col items-center">
-20:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10': true}">
-21:           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-22:             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-23:           </svg>
-24:         </div>
-25:         <h3 class="text-dark-text font-medium mb-1">Bedrooms</h3>
-26:         <p class="text-light-text">{{ property.stats.bedrooms }}</p>
-27:       </div>
-28:       <div class="bg-light-background rounded-lg p-5 text-center flex flex-col items-center">
-29:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10': true}">
-30:           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-31:             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-32:           </svg>
-33:         </div>
-34:         <h3 class="text-dark-text font-medium mb-1">Bathrooms</h3>
-35:         <p class="text-light-text">{{ property.stats.bathrooms }}</p>
-36:       </div>
-37:       <div class="bg-light-background rounded-lg p-5 text-center flex flex-col items-center">
-38:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10': true}">
-39:           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-40:             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-41:           </svg>
-42:         </div>
-43:         <h3 class="text-dark-text font-medium mb-1">Area</h3>
-44:         <p class="text-light-text">{{ property.stats.area }}</p>
-45:       </div>
-46:     </div>
-47:   `
-48: })
-49: export class PropertyStatsComponent {
-50:   @Input() property!: Property;
-51: }
-</file>
-
-<file path="src/app/components/room-details.component.ts">
-  1: import { Component, Input, OnChanges, SimpleChanges, signal, inject, ChangeDetectorRef } from '@angular/core';
-  2: import { CommonModule, NgClass } from '@angular/common';
-  3: import { Room, RoomEnhanced } from '../models/room.model';
-  4: import { RoomService } from '../services/room.service';
-  5: @Component({
-  6:   selector: 'app-room-details',
-  7:   standalone: true,
-  8:   imports: [CommonModule, NgClass],
-  9:   template: `
- 10:     <!-- Loading State -->
- 11:     <div *ngIf="loading()" class="flex justify-center items-center py-16">
- 12:       <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
- 13:     </div>
- 14:     <!-- Room Details Content -->
- 15:     <div *ngIf="!loading() && room()" class="w-full">
- 16:       <h3 class="text-xl font-medium text-dark-text mb-4 flex items-center">
- 17:         {{ room()?.name }}
- 18:       </h3>
- 19:       <p class="text-light-text mb-6 leading-relaxed text-left">{{ room()?.description }}</p>
- 20:       <!-- Room Photos with Progressive Loading -->
- 21:       <div class="mb-8">
- 22:         <h4 class="text-lg font-medium text-dark-text mb-3">Room Photos</h4>
- 23:         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
- 24:           <div *ngFor="let photo of roomPhotos()" class="bg-gray-100 rounded-lg overflow-hidden h-56 relative">
- 25:             <!-- Low-res background image (loads instantly) -->
- 26:             <img
- 27:               *ngIf="photo.lowRes"
- 28:               [src]="photo.lowRes"
- 29:               [alt]="room()?.name"
- 30:               class="w-full h-full object-cover absolute inset-0 transition-opacity duration-300"
- 31:               [class.opacity-0]="photo.highResLoaded"
- 32:             >
- 33:             <!-- High-res image (lazy loaded) -->
- 34:             <img
- 35:               *ngIf="photo.highRes"
- 36:               [src]="photo.highRes"
- 37:               [alt]="room()?.name"
- 38:               class="w-full h-full object-cover absolute inset-0 transition-opacity duration-500"
- 39:               [class.opacity-100]="photo.highResLoaded"
- 40:               [class.opacity-0]="!photo.highResLoaded"
- 41:               (load)="onHighResImageLoaded(photo)"
- 42:               loading="lazy"
- 43:             >
- 44:           </div>
- 45:         </div>
- 46:       </div>
- 47:       <!-- Room Features -->
- 48:       <div *ngIf="room()?.features && room()?.features!.length > 0" class="bg-light-background rounded-lg p-6">
- 49:         <h4 class="text-lg font-medium text-dark-text mb-4">Features</h4>
- 50:         <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
- 51:           <li *ngFor="let feature of room()?.features" class="flex text-left items-start">
- 52:             <div class="flex-shrink-0 rounded-full p-1 mr-3" [ngClass]="{'bg-primary/10': true}">
- 53:               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- 54:                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
- 55:               </svg>
- 56:             </div>
- 57:             <span class="text-light-text">{{ feature }}</span>
- 58:           </li>
- 59:         </ul>
- 60:       </div>
- 61:     </div>
- 62:     <!-- Empty/Not Selected State -->
- 63:     <div *ngIf="!loading() && !room()" class="w-full text-center py-12 px-4 bg-light-background rounded-lg">
- 64:       <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- 65:         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
- 66:       </svg>
- 67:       <p class="text-light-text">Select a room from the floorplan to view details</p>
- 68:     </div>
- 69:   `
- 70: })
- 71: export class RoomDetailsComponent implements OnChanges {
- 72:   @Input() roomId: string = '';
- 73:   room = signal<Room | null>(null);
- 74:   loading = signal<boolean>(false);
- 75:   roomPhotos = signal<{ highRes: string; lowRes: string; highResLoaded: boolean }[]>([]);
- 76:   private roomService = inject(RoomService);
- 77:   private cdr = inject(ChangeDetectorRef);
- 78:   ngOnChanges(changes: SimpleChanges): void {
- 79:     if (changes['roomId'] && this.roomId) {
- 80:       this.loadRoomData(this.roomId);
- 81:     }
- 82:   }
- 83:   private loadRoomData(id: string): void {
- 84:     this.loading.set(true);
- 85:     this.roomService.getRoom(id).subscribe({
- 86:       next: (roomData) => {
- 87:         this.room.set(roomData);
- 88:         const photos = roomData.photos.map(photo => ({
- 89:           highRes: photo,
- 90:           lowRes: photo,
- 91:           highResLoaded: false
- 92:         }));
- 93:         this.roomPhotos.set(photos);
- 94:         this.loading.set(false);
- 95:         this.cdr.detectChanges();
- 96:       },
- 97:       error: (error) => {
- 98:         console.error('Error loading room data:', error);
- 99:         this.room.set(null);
-100:         this.loading.set(false);
-101:       }
-102:     });
-103:   }
-104:   onHighResImageLoaded(photo: { highRes: string; lowRes: string; highResLoaded: boolean }): void {
-105:     photo.highResLoaded = true;
-106:     this.cdr.detectChanges();
-107:   }
-108: }
+<file path="src/app/app.config.ts">
+ 1: import {
+ 2:   provideHttpClient,
+ 3:   withFetch,
+ 4:   withInterceptors,
+ 5: } from '@angular/common/http';
+ 6: import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+ 7: import { provideClientHydration } from '@angular/platform-browser';
+ 8: import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
+ 9: import { provideIcons } from '@ng-icons/core';
+10: import {
+11:   tablerHome,
+12:   tablerBed,
+13:   tablerBath,
+14:   tablerMaximize,
+15:   tablerBuildingCommunity,
+16:   tablerMapPin,
+17:   tablerPhone,
+18:   tablerCalendarEvent,
+19:   tablerChevronRight,
+20:   tablerChevronLeft,
+21:   tablerSun,
+22:   tablerMoon,
+23:   tablerMenu2,
+24:   tablerCheck,
+25:   tablerSearch,
+26:   tablerInfoCircle,
+27:   tablerMoodSad,
+28:   tablerAlertCircle
+29: } from '@ng-icons/tabler-icons';
+30: export const appConfig: ApplicationConfig = {
+31:   providers: [
+32:     provideZoneChangeDetection({ eventCoalescing: true }),
+33:     provideFileRouter(),
+34:     provideHttpClient(
+35:       withFetch(),
+36:       withInterceptors([requestContextInterceptor])
+37:     ),
+38:     provideClientHydration(),
+39:     provideIcons({
+40:       tablerHome,
+41:       tablerBed,
+42:       tablerBath,
+43:       tablerMaximize,
+44:       tablerBuildingCommunity,
+45:       tablerMapPin,
+46:       tablerPhone,
+47:       tablerCalendarEvent,
+48:       tablerChevronRight,
+49:       tablerChevronLeft,
+50:       tablerSun,
+51:       tablerMoon,
+52:       tablerMenu2,
+53:       tablerCheck,
+54:       tablerSearch,
+55:       tablerInfoCircle,
+56:       tablerMoodSad,
+57:       tablerAlertCircle
+58:     })
+59:   ],
+60: };
 </file>
 
 <file path="src/app/models/property.model.ts">
@@ -760,182 +565,6 @@ This section contains the contents of the repository's files.
 31: }
 </file>
 
-<file path="src/app/pages/property/[id].page.ts">
-  1: import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
-  2: import { CommonModule, NgClass } from '@angular/common';
-  3: import { ActivatedRoute, RouterLink } from '@angular/router';
-  4: import { switchMap } from 'rxjs/operators';
-  5: import { PropertyService } from '../../services/property.service';
-  6: import { RoomService } from '../../services/room.service';
-  7: import { Property } from '../../models/property.model';
-  8: import { Room } from '../../models/room.model';
-  9: import { PropertyStatsComponent } from '../../components/property-stats.component';
- 10: import { FloorPlanComponent } from '../../components/floor-plan.component';
- 11: import { RoomDetailsComponent } from '../../components/room-details.component';
- 12: @Component({
- 13:   selector: 'app-property-detail',
- 14:   standalone: true,
- 15:   imports: [
- 16:     CommonModule,
- 17:     NgClass,
- 18:     PropertyStatsComponent,
- 19:     FloorPlanComponent,
- 20:     RoomDetailsComponent,
- 21:     RouterLink
- 22:   ],
- 23:   template: `
- 24:     <!-- Loading State -->
- 25:     <div *ngIf="isLoading" class="flex justify-center items-center py-24">
- 26:       <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
- 27:     </div>
- 28:     <!-- Property Detail Content -->
- 29:     <div *ngIf="!isLoading && property" class="bg-light-background pb-16">
- 30:       <!-- Property Header -->
- 31:       <div class="bg-white shadow-md py-8">
- 32:         <div class="container mx-auto px-4">
- 33:           <!-- Breadcrumbs -->
- 34:           <div class="flex items-center text-sm mb-4">
- 35:             <a routerLink="/" class="text-light-text hover:text-primary transition-colors">Home</a>
- 36:             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- 37:               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
- 38:             </svg>
- 39:             <span class="text-primary">{{ property.title }}</span>
- 40:           </div>
- 41:           <!-- Property Title & Price -->
- 42:           <div class="text-center mb-4">
- 43:             <h1 class="text-3xl md:text-4xl font-medium text-dark-text mb-2">{{ property.title }}</h1>
- 44:             <p class="text-light-text text-lg">{{ property.address }}</p>
- 45:             <p class="text-primary text-3xl md:text-4xl font-medium mt-4">{{ property.price }}</p>
- 46:           </div>
- 47:         </div>
- 48:       </div>
- 49:       <!-- Main Content -->
- 50:       <div class="container mx-auto px-4 -mt-6">
- 51:         <!-- Property Gallery -->
- 52:         <div class="mb-8 bg-white rounded-lg shadow-md overflow-hidden">
- 53:           <div class="h-64 sm:h-80 md:h-96 lg:h-112 bg-gray-200">
- 54:             <img [src]="property.thumbnail" [alt]="property.title" class="w-full h-full object-cover">
- 55:           </div>
- 56:         </div>
- 57:         <!-- Property Stats Card -->
- 58:         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
- 59:           <h2 class="text-2xl font-medium text-dark-text mb-6">Property Overview</h2>
- 60:           <app-property-stats [property]="property"></app-property-stats>
- 61:           <!-- Property Description -->
- 62:           <div class="mt-8">
- 63:             <h3 class="text-xl font-medium text-dark-text mb-4">About this property</h3>
- 64:             <p class="text-light-text leading-relaxed">{{ property.description }}</p>
- 65:           </div>
- 66:         </div>
- 67:         <!-- Floorplan & Room Details Section -->
- 68:         <div *ngIf="!isLoading && rooms.length > 0" class="flex flex-col lg:flex-row gap-8 mb-12">
- 69:           <!-- Floorplan Column -->
- 70:           <div class="w-full lg:w-1/2 bg-white rounded-lg shadow-md p-6">
- 71:             <app-floor-plan
- 72:               [rooms]="rooms"
- 73:               [activeRoom]="selectedRoomId()"
- 74:               [floorplanImage]="property.floorplan.image"
- 75:               [orientation]="property.floorplan.orientation"
- 76:               (roomSelected)="onRoomSelected($event)">
- 77:             </app-floor-plan>
- 78:           </div>
- 79:           <!-- Room Details Column -->
- 80:           <div class="w-full lg:w-1/2 bg-white rounded-lg shadow-md p-6">
- 81:             <app-room-details [roomId]="selectedRoomId()"></app-room-details>
- 82:           </div>
- 83:         </div>
- 84:         <!-- Contact/CTA Section -->
- 85:         <div class="bg-white rounded-lg shadow-md p-8 text-center">
- 86:           <h2 class="text-2xl font-medium text-dark-text mb-4">Interested in this property?</h2>
- 87:           <p class="text-light-text max-w-2xl mx-auto mb-6">Schedule a viewing or get more information about this property by contacting our agents.</p>
- 88:           <div class="flex flex-col sm:flex-row justify-center gap-4">
- 89:             <button class="text-white px-6 py-3 rounded-lg flex items-center justify-center transition-opacity" [ngClass]="{'bg-primary hover:bg-primary/90': true}">
- 90:               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- 91:                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
- 92:               </svg>
- 93:               Contact Agent
- 94:             </button>
- 95:             <button class="border border-primary text-white px-6 py-3 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
- 96:               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- 97:                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
- 98:               </svg>
- 99:               Schedule Viewing
-100:             </button>
-101:           </div>
-102:         </div>
-103:       </div>
-104:     </div>
-105:     <!-- Error State -->
-106:     <div *ngIf="!isLoading && !property" class="container mx-auto px-4 py-24 text-center">
-107:       <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-108:         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-109:       </svg>
-110:       <h2 class="text-2xl font-medium text-dark-text mb-4">Property Not Found</h2>
-111:       <p class="text-light-text mb-8">The property you're looking for doesn't exist or has been removed.</p>
-112:       <a routerLink="/" class="text-white px-6 py-3 rounded-lg inline-flex items-center transition-opacity" [ngClass]="{'bg-primary hover:bg-primary/90': true}">
-113:         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-114:           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-115:         </svg>
-116:         Back to Home
-117:       </a>
-118:     </div>
-119:   `
-120: })
-121: export default class PropertyDetailPage implements OnInit {
-122:   property?: Property;
-123:   rooms: Room[] = [];
-124:   selectedRoomId = signal('');
-125:   isLoading: boolean = true;
-126:   constructor(
-127:     private route: ActivatedRoute,
-128:     private propertyService: PropertyService,
-129:     private roomService: RoomService,
-130:     private cdr: ChangeDetectorRef
-131:   ) {}
-132:   ngOnInit(): void {
-133:     this.loadPropertyData();
-134:   }
-135:   loadPropertyData(): void {
-136:     this.isLoading = true;
-137:     this.route.paramMap.pipe(
-138:       switchMap(params => {
-139:         const id = params.get('id') ?? '';
-140:         return this.propertyService.getProperty(id);
-141:       })
-142:     ).subscribe({
-143:       next: (property) => {
-144:         this.property = property;
-145:         // Once we have the property, load the rooms
-146:         this.roomService.getRoomsByPropertyId(property.id).subscribe({
-147:           next: (rooms) => {
-148:             this.rooms = rooms;
-149:             if (rooms.length > 0) {
-150:               // Set the signal value
-151:               this.selectedRoomId.set(rooms[0].id);
-152:             }
-153:             this.isLoading = false;
-154:             // Ensure proper change detection
-155:             this.cdr.detectChanges();
-156:           },
-157:           error: (error) => {
-158:             console.error('Error loading rooms data:', error);
-159:             this.isLoading = false;
-160:           }
-161:         });
-162:       },
-163:       error: (error) => {
-164:         console.error('Error loading property data:', error);
-165:         this.isLoading = false;
-166:       }
-167:     });
-168:   }
-169:   onRoomSelected(roomId: string): void {
-170:     this.selectedRoomId.set(roomId);
-171:     this.cdr.detectChanges();
-172:   }
-173: }
-</file>
-
 <file path="src/app/services/room.service.ts">
  1: import { Injectable } from '@angular/core';
  2: import { HttpClient } from '@angular/common/http';
@@ -1001,372 +630,578 @@ This section contains the contents of the repository's files.
 38: ]
 </file>
 
-<file path="src/app/components/layout.component.ts">
-  1: import { Component } from '@angular/core';
-  2: import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-  3: import { CommonModule } from '@angular/common';
-  4: @Component({
-  5:   selector: 'app-layout',
-  6:   standalone: true,
-  7:   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
-  8:   template: `
-  9:     <!-- Header -->
- 10:     <header class="bg-white shadow-sm sticky top-0 z-50">
- 11:       <div
- 12:         class="container mx-auto px-4 py-3 flex justify-between items-center"
- 13:       >
- 14:         <a routerLink="/" class="flex flex-row justify-start items-start">
- 15:           <svg
- 16:             width="150"
- 17:             height="42"
- 18:             viewBox="0 0 698 192"
- 19:             xmlns="http://www.w3.org/2000/svg"
- 20:           >
- 21:             <g
- 22:               transform="matrix(1.333333, 0, 0, -1.333333, -53.881176, 793.701355)"
- 23:             >
- 24:               <g transform="matrix(1, 0, 0, 1, 0, 227.155548)">
- 25:                 <g>
- 26:                   <path
- 27:                     d="m 0,0 c -24.707,2.223 -44.073,22.975 -44.073,48.26 0,26.768 21.7,48.468 48.468,48.468 25.286,0 46.039,-19.366 48.26,-44.073 h 14.637 c -2.258,32.778 -29.545,58.673 -62.897,58.673 -34.831,0 -63.067,-28.237 -63.067,-63.068 0,-33.352 25.895,-60.639 58.673,-62.897 z"
- 28:                     style="fill:#444443;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 29:                     transform="translate(106.5829,249.2926)"
- 30:                   />
- 31:                   <path
- 32:                     d="M 0,0 C -2.092,-23.259 -20.607,-41.774 -43.866,-43.866 V -58.503 C -12.541,-56.345 12.479,-31.325 14.637,0 Z"
- 33:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 34:                     transform="translate(159.2381,293.1588)"
- 35:                   />
- 36:                   <path
- 37:                     d="M 0,0 V 65.819 H 43.848 V 56.642 H 10.382 V 36.988 H 38.378 V 28.366 H 10.382 L 10.382,0 Z"
- 38:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 39:                     transform="translate(210.5292,284.8434)"
- 40:                   />
- 41:                   <path
- 42:                     d="m 0,0 h 18.17 c 1.482,0 2.828,0.324 4.033,0.972 1.205,0.65 2.238,1.545 3.105,2.69 0.865,1.143 1.544,2.456 2.039,3.939 0.494,1.484 0.742,3.059 0.742,4.729 0,1.668 -0.295,3.243 -0.881,4.727 -0.588,1.483 -1.359,2.78 -2.317,3.893 -0.958,1.112 -2.071,1.993 -3.337,2.643 -1.268,0.648 -2.582,0.973 -3.94,0.973 L 0,24.566 Z m -10.382,-32.075 v 65.819 h 28.645 c 2.966,0 5.7,-0.619 8.203,-1.855 2.504,-1.237 4.65,-2.859 6.443,-4.866 1.793,-2.009 3.198,-4.297 4.218,-6.86 1.02,-2.566 1.529,-5.178 1.529,-7.833 0,-2.226 -0.309,-4.358 -0.926,-6.397 C 37.112,3.893 36.246,2.007 35.134,0.278 34.021,-1.453 32.662,-2.953 31.056,-4.218 29.448,-5.486 27.687,-6.429 25.771,-7.046 L 41.253,-32.075 H 29.479 L 15.203,-9.179 H 0 v -22.896 z"
- 43:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 44:                     transform="translate(288.4901,316.9186)"
- 45:                   />
- 46:                   <path
- 47:                     d="M 0,0 V -9.177 H -45.146 V 56.642 H -0.835 V 47.465 H -34.764 V 28.739 H -5.377 V 20.117 H -34.764 V 0 Z"
- 48:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 49:                     transform="translate(398.4354,294.0202)"
- 50:                   />
- 51:                   <path
- 52:                     d="m 0,0 c -0.618,0.679 -1.515,1.405 -2.688,2.178 -1.173,0.772 -2.548,1.499 -4.125,2.179 -1.576,0.679 -3.307,1.236 -5.191,1.668 -1.887,0.432 -3.817,0.649 -5.795,0.649 -4.388,0 -7.617,-0.803 -9.686,-2.409 -2.073,-1.608 -3.106,-3.833 -3.106,-6.675 0,-1.608 0.323,-2.921 0.974,-3.941 0.649,-1.02 1.652,-1.916 3.013,-2.688 1.358,-0.773 3.058,-1.453 5.097,-2.039 2.04,-0.588 4.418,-1.221 7.14,-1.901 3.337,-0.804 6.348,-1.7 9.038,-2.688 2.687,-0.989 4.959,-2.194 6.813,-3.615 1.854,-1.423 3.291,-3.168 4.311,-5.238 1.018,-2.071 1.529,-4.589 1.529,-7.556 0,-3.337 -0.634,-6.21 -1.9,-8.62 -1.268,-2.412 -2.998,-4.374 -5.191,-5.887 -2.196,-1.516 -4.745,-2.628 -7.648,-3.338 -2.905,-0.709 -6.026,-1.066 -9.364,-1.066 -5.005,0 -9.842,0.756 -14.508,2.271 -4.666,1.513 -8.884,3.723 -12.653,6.629 l 4.727,8.899 c 0.802,-0.804 1.961,-1.701 3.477,-2.688 1.514,-0.989 3.275,-1.901 5.284,-2.736 2.007,-0.833 4.185,-1.544 6.535,-2.131 2.349,-0.589 4.79,-0.881 7.324,-0.881 4.078,0 7.231,0.71 9.455,2.133 2.226,1.421 3.338,3.523 3.338,6.303 0,1.669 -0.417,3.06 -1.252,4.172 -0.834,1.112 -2.025,2.086 -3.568,2.921 -1.546,0.833 -3.43,1.589 -5.655,2.271 -2.225,0.678 -4.76,1.39 -7.602,2.132 -3.277,0.864 -6.135,1.776 -8.575,2.734 -2.443,0.958 -4.466,2.117 -6.071,3.476 -1.609,1.359 -2.829,2.95 -3.664,4.774 -0.833,1.822 -1.251,4.033 -1.251,6.628 0,3.213 0.618,6.073 1.855,8.576 1.235,2.503 2.921,4.603 5.053,6.304 2.131,1.699 4.648,2.981 7.553,3.846 2.906,0.865 6.057,1.298 9.457,1.298 4.45,0 8.559,-0.711 12.33,-2.132 3.767,-1.422 7.076,-3.183 9.919,-5.285 z"
- 53:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 54:                     transform="translate(460.6376,335.1808)"
- 55:                   />
- 56:                   <path
- 57:                     d="m 0,0 v -65.819 h -10.477 v 29.016 H -43.663 V -65.819 H -54.045 V 0 h 10.382 v -27.533 h 33.186 V 0 Z"
- 58:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
- 59:                     transform="translate(546.2958,350.6623)"
- 60:                   />
- 61:                 </g>
- 62:               </g>
- 63:             </g>
- 64:           </svg>
- 65:           <span class="ml-2 text-xl font-medium text-dark-text">Spaces</span>
- 66:         </a>
- 67:         <nav class="hidden md:flex items-center">
- 68:           <ul class="flex space-x-8">
- 69:             <li>
- 70:               <a
- 71:                 routerLink="/"
- 72:                 routerLinkActive="text-primary font-medium"
- 73:                 [routerLinkActiveOptions]="{ exact: true }"
- 74:                 class="text-light-text hover:text-primary transition-colors duration-200"
- 75:               >
- 76:                 Home
- 77:               </a>
- 78:             </li>
- 79:             <li>
- 80:               <a
- 81:                 routerLink="/"
- 82:                 class="text-light-text hover:text-primary transition-colors duration-200"
- 83:               >
- 84:                 Listings
- 85:               </a>
- 86:             </li>
- 87:             <li>
- 88:               <a
- 89:                 href="#"
- 90:                 class="text-light-text hover:text-primary transition-colors duration-200"
- 91:               >
- 92:                 Contact
- 93:               </a>
- 94:             </li>
- 95:           </ul>
- 96:          <!-- <div class="ml-8 space-x-4">
- 97:             <button
- 98:               class="px-4 py-2 border border-primary text-white rounded-md hover:bg-primary hover:text-white transition-colors duration-200"
- 99:             >
-100:               Sign In
-101:             </button>
-102:             <button
-103:               class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition-opacity duration-200"
-104:             >
-105:               Get Started
-106:             </button>
-107:           </div> -->
-108:         </nav>
-109:         <!-- Mobile menu button -->
-110:         <button class="md:hidden flex items-center">
-111:           <svg
-112:             xmlns="http://www.w3.org/2000/svg"
-113:             class="h-6 w-6 text-white"
-114:             fill="none"
-115:             viewBox="0 0 24 24"
-116:             stroke="currentColor"
-117:           >
-118:             <path
-119:               stroke-linecap="round"
-120:               stroke-linejoin="round"
-121:               stroke-width="2"
-122:               d="M4 6h16M4 12h16M4 18h16"
-123:             />
-124:           </svg>
-125:         </button>
-126:       </div>
-127:     </header>
-128:     <main class="min-h-screen">
-129:       <router-outlet></router-outlet>
-130:     </main>
-131:     <!-- Footer -->
-132:     <footer class="bg-dark-background text-white py-8 mt-12">
-133:       <div class="container mx-auto px-4">
-134:         <div class="flex flex-col md:flex-row justify-between items-center">
-135:           <div class="flex flex-col justify-start items-start mb-4 md:mb-0">
-136:             <a href="/" class="flex items-center">
-137:               <span class="text-xl font-medium text-primary"
-138:                 >Fresh Projects</span
-139:               >
-140:               <span class="ml-2 text-xl font-medium text-white">Spaces</span>
-141:             </a>
-142:             <span class="text-gray-200 mt-2">Find your perfect home</span>
-143:           </div>
-144:           <div
-145:             class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-8"
-146:           >
-147:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
-148:               >About Us</a
-149:             >
-150:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
-151:               >Terms of Service</a
-152:             >
-153:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
-154:               >Privacy Policy</a
-155:             >
-156:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
-157:               >Contact</a
-158:             >
-159:           </div>
-160:         </div>
-161:         <div
-162:           class="mt-8 pt-8 border-t border-gray-800 text-center md:text-right"
-163:         >
-164:           <span class="text-gray-400">
-165:             &copy; 2025 Fresh Projects Spaces. All rights reserved.
-166:           </span>
-167:         </div>
-168:       </div>
-169:     </footer>
-170:   `,
-171: })
-172: export class LayoutComponent {}
+<file path="tailwind.config.js">
+ 1: module.exports = {
+ 2:   content: [
+ 3:     "./src/**/*.{html,ts}",
+ 4:   ],
+ 5:   darkMode: 'class',
+ 6:   theme: {
+ 7:     extend: {
+ 8:       colors: {
+ 9:         primary: '#74BA43',
+10:         success: '#42758F',
+11:         warning: '#EB6209',
+12:         'dark-background': '#3D3D3C',
+13:         'light-background': '#F0F5FF',
+14:         'dark-text': '#152542',
+15:         'light-text': '#3E547C',
+16:         'custom-0': '#54565a',
+17:         'custom-1': '#f16022',
+18:         'custom-2': '#42758f',
+19:         'custom-3': '#f19b76',
+20:         'custom-4': '#FFFFFF',
+21:         'custom-5': '#91bd77',
+22:         'custom-6': '#F8F8F8',
+23:         'custom-7': '#777777',
+24:       },
+25:       fontFamily: {
+26:         raleway: ['Raleway', 'sans-serif'],
+27:         inter: ['Inter', 'sans-serif'],
+28:       },
+29:       boxShadow: {
+30:         'sm': '0px 1px 3px rgba(0, 0, 0, 0.12)',
+31:         'md': '0px 5px 20px -5px rgba(0, 0, 0, 0.15)',
+32:         'lg': '0px 10px 25px -8px rgba(0, 0, 0, 0.25)',
+33:         'xl': '0px 20px 40px -10px rgba(0, 0, 0, 0.25)',
+34:       }
+35:     },
+36:   },
+37:   corePlugins: {
+38:     preflight: true,
+39:     dark: true,
+40:   },
+41:   safelist: [
+42:     'bg-white',
+43:     'dark:bg-gray-900',
+44:     'dark:bg-gray-800',
+45:     'dark:bg-gray-700',
+46:     'text-dark-text',
+47:     'dark:text-white'
+48:   ],
+49:   plugins: [],
+50: }
 </file>
 
-<file path="src/app/pages/index.page.ts">
- 1: import { Component, OnInit } from '@angular/core';
+<file path="src/app/app.component.ts">
+ 1: import { Component, inject } from '@angular/core';
+ 2: import { LayoutComponent } from './components/layout.component';
+ 3: import { ThemeService } from './services/theme.service';
+ 4: @Component({
+ 5:   selector: 'app-root',
+ 6:   standalone: true,
+ 7:   imports: [LayoutComponent],
+ 8:   template: `
+ 9:     <app-layout></app-layout>
+10:   `,
+11:   styles: `
+12:     :host {
+13:       max-width: 1280px;
+14:       margin: 0 auto;
+15:       text-align: center;
+16:     }
+17:   `,
+18: })
+19: export class AppComponent {
+20:   private themeService = inject(ThemeService);
+21: }
+</file>
+
+<file path="src/app/components/property-card.component.ts">
+  1: import { Component, Input } from '@angular/core';
+  2: import { RouterLink } from '@angular/router';
+  3: import { Property } from '../models/property.model';
+  4: import { CommonModule, NgClass } from '@angular/common';
+  5: import { NgIcon } from '@ng-icons/core';
+  6: @Component({
+  7:   selector: 'app-property-card',
+  8:   standalone: true,
+  9:   imports: [RouterLink, CommonModule, NgClass, NgIcon],
+ 10:   template: `
+ 11:     <div
+ 12:       class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 mb-6"
+ 13:     >
+ 14:       <div class="flex flex-col md:flex-row">
+ 15:         <!-- Property Image -->
+ 16:         <div class="md:w-2/5 h-64 md:h-auto relative">
+ 17:           <img
+ 18:             [src]="property.thumbnail"
+ 19:             [alt]="property.title"
+ 20:             class="w-full h-full object-cover"
+ 21:           />
+ 22:           <div
+ 23:             class="absolute top-4 right-4 bg-primary text-white px-2 py-1 rounded text-sm font-medium"
+ 24:           >
+ 25:             For Sale
+ 26:           </div>
+ 27:         </div>
+ 28:         <!-- Property Details -->
+ 29:         <div class="md:w-3/5 p-6 flex flex-col justify-between">
+ 30:           <div>
+ 31:             <div
+ 32:               class="flex flex-col md:flex-row md:justify-between md:items-start mb-4"
+ 33:             >
+ 34:               <div>
+ 35:                 <h3
+ 36:                   class="text-xl font-medium text-dark-text dark:text-white mb-1"
+ 37:                 >
+ 38:                   {{ property.title }}
+ 39:                 </h3>
+ 40:                 <p class="text-light-text dark:text-gray-300 mb-2">
+ 41:                   {{ property.address }}
+ 42:                 </p>
+ 43:               </div>
+ 44:               <p class="text-primary font-medium text-xl md:text-right">
+ 45:                 {{ property.price }}
+ 46:               </p>
+ 47:             </div>
+ 48:             <p
+ 49:               class="text-light-text dark:text-gray-300 mb-4 line-clamp-3 text-left"
+ 50:             >
+ 51:               {{ property.description }}
+ 52:             </p>
+ 53:           </div>
+ 54:           <!-- Property Stats and CTA -->
+ 55:           <div class="mt-auto">
+ 56:             <div
+ 57:               class="flex justify-between text-light-text dark:text-gray-300 text-sm mb-4"
+ 58:             >
+ 59:               <div class="flex items-center">
+ 60:                 <div
+ 61:                   class="flex items-center bg-primary/10 dark:bg-primary/20 rounded-full p-1 mr-2"
+ 62:                 >
+ 63:                   <ng-icon
+ 64:                     name="tablerBed"
+ 65:                     class="text-primary text-2xl sm:text-5xl"
+ 66:                   ></ng-icon>
+ 67:                 </div>
+ 68:                 <span class="text-base font-medium"
+ 69:                   >{{ property.stats.bedrooms }} Bed{{
+ 70:                     property.stats.bedrooms !== 1 ? 's' : ''
+ 71:                   }}</span
+ 72:                 >
+ 73:               </div>
+ 74:               <div class="flex items-center">
+ 75:                 <div
+ 76:                   class="flex items-center bg-primary/10 dark:bg-primary/20 rounded-full p-1 mr-2"
+ 77:                 >
+ 78:                   <ng-icon
+ 79:                     name="tablerBath"
+ 80:                     class="text-primary text-2xl sm:text-5xl"
+ 81:                   ></ng-icon>
+ 82:                 </div>
+ 83:                 <span class="text-base font-medium"
+ 84:                   >{{ property.stats.bathrooms }} Bath{{
+ 85:                     property.stats.bathrooms !== 1 ? 's' : ''
+ 86:                   }}</span
+ 87:                 >
+ 88:               </div>
+ 89:               <div class="flex items-center">
+ 90:                 <div
+ 91:                   class="flex items-center bg-primary/10 dark:bg-primary/20 rounded-full p-1 mr-2"
+ 92:                 >
+ 93:                   <ng-icon
+ 94:                     name="tablerMaximize"
+ 95:                     class="text-primary text-2xl sm:text-5xl"
+ 96:                   ></ng-icon>
+ 97:                 </div>
+ 98:                 <span class="text-base font-medium">{{
+ 99:                   property.stats.area
+100:                 }}</span>
+101:               </div>
+102:             </div>
+103:             <a
+104:               [routerLink]="['/property', property.id]"
+105:               class="text-white px-4 py-2 rounded-lg inline-flex items-center transition-opacity duration-300"
+106:               [ngClass]="{
+107:                 'bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary': true
+108:               }"
+109:             >
+110:               <span>View Details</span>
+111:               <ng-icon name="tablerChevronRight" class="ml-2 text-xl"></ng-icon>
+112:             </a>
+113:           </div>
+114:         </div>
+115:       </div>
+116:     </div>
+117:   `,
+118: })
+119: export class PropertyCardComponent {
+120:   @Input() property!: Property;
+121: }
+</file>
+
+<file path="src/app/components/property-stats.component.ts">
+ 1: import { Component, Input } from '@angular/core';
  2: import { CommonModule, NgClass } from '@angular/common';
- 3: import { PropertyCardComponent } from '../components/property-card.component';
- 4: import { PropertyService } from '../services/property.service';
- 5: import { Property } from '../models/property.model';
- 6: @Component({
- 7:   selector: 'app-home',
- 8:   standalone: true,
- 9:   imports: [CommonModule, NgClass, PropertyCardComponent],
-10:   template: `
-11:     <div class="bg-light-background py-16">
-12:       <div class="container mx-auto px-4">
-13:         <div class="text-center mb-12">
-14:           <h1 class="text-4xl md:text-5xl font-medium text-dark-text mb-4">Fresh Projects Spaces</h1>
-15:           <p class="text-light-text text-xl max-w-3xl mx-auto">Find your perfect home with our interactive property listings</p>
-16:         </div>
-17:         <!-- Search Box (Optional) -->
-18:         <div class="max-w-4xl mx-auto mb-12">
-19:           <div class="bg-white rounded-lg shadow-md p-4 flex items-center">
-20:             <div class="relative flex-grow">
-21:               <input
-22:                 type="text"
-23:                 placeholder="Search properties by location, features..."
-24:                 class="w-full pl-10 pr-4 py-3 rounded-md border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-25:               >
-26:               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-27:                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-28:               </svg>
-29:             </div>
-30:             <button class="ml-4 text-white px-6 py-3 rounded-md transition-opacity duration-200" [ngClass]="{'bg-primary hover:bg-primary/90': true}">
-31:               Search
-32:             </button>
-33:           </div>
-34:         </div>
-35:       </div>
-36:     </div>
-37:     <div class="container mx-auto px-4 py-12">
-38:       <!-- Featured Properties Heading -->
-39:       <div class="mb-8">
-40:         <h2 class="text-3xl font-medium text-dark-text mb-2">Featured Properties</h2>
-41:         <div class="w-20 h-1 bg-primary rounded-full"></div>
-42:       </div>
-43:       <!-- Loading State -->
-44:       <div *ngIf="loading" class="flex justify-center items-center py-16">
-45:         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-46:       </div>
-47:       <!-- No Properties State -->
-48:       <div *ngIf="!loading && properties.length === 0" class="text-center py-16">
-49:         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-50:           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-51:         </svg>
-52:         <p class="text-light-text text-lg">No properties available at the moment.</p>
-53:       </div>
-54:       <!-- Properties List -->
-55:       <div *ngIf="!loading && properties.length > 0">
-56:         <app-property-card *ngFor="let property of properties" [property]="property"></app-property-card>
-57:       </div>
-58:     </div>
-59:   `
-60: })
-61: export default class HomePage implements OnInit {
-62:   properties: Property[] = [];
-63:   loading: boolean = true;
-64:   constructor(private propertyService: PropertyService) {}
-65:   ngOnInit(): void {
-66:     this.propertyService.getProperties().subscribe({
-67:       next: (properties) => {
-68:         this.properties = properties;
-69:         this.loading = false;
-70:       },
-71:       error: (error) => {
-72:         console.error('Error loading properties:', error);
-73:         this.loading = false;
-74:       }
-75:     });
-76:   }
-77: }
+ 3: import { Property } from '../models/property.model';
+ 4: import { NgIcon } from '@ng-icons/core';
+ 5: @Component({
+ 6:   selector: 'app-property-stats',
+ 7:   standalone: true,
+ 8:   imports: [CommonModule, NgClass, NgIcon],
+ 9:   template: `
+10:     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+11:       <div class="bg-light-background dark:bg-gray-700 rounded-lg p-5 text-center flex flex-col items-center">
+12:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10 dark:bg-primary/20': true}">
+13:           <ng-icon name="tablerBuildingCommunity" class="text-primary text-6xl"></ng-icon>
+14:         </div>
+15:         <h3 class="text-dark-text dark:text-white font-medium mb-1">Property Type</h3>
+16:         <p class="text-light-text dark:text-gray-300 text-xl font-bold">{{ property.stats.type }}</p>
+17:       </div>
+18:       <div class="bg-light-background dark:bg-gray-700 rounded-lg p-5 text-center flex flex-col items-center">
+19:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10 dark:bg-primary/20': true}">
+20:           <ng-icon name="tablerBed" class="text-primary text-6xl"></ng-icon>
+21:         </div>
+22:         <h3 class="text-dark-text dark:text-white font-medium mb-1">Bedrooms</h3>
+23:         <p class="text-light-text dark:text-gray-300 text-xl font-bold">{{ property.stats.bedrooms }}</p>
+24:       </div>
+25:       <div class="bg-light-background dark:bg-gray-700 rounded-lg p-5 text-center flex flex-col items-center">
+26:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10 dark:bg-primary/20': true}">
+27:           <ng-icon name="tablerBath" class="text-primary text-6xl"></ng-icon>
+28:         </div>
+29:         <h3 class="text-dark-text dark:text-white font-medium mb-1">Bathrooms</h3>
+30:         <p class="text-light-text dark:text-gray-300 text-xl font-bold">{{ property.stats.bathrooms }}</p>
+31:       </div>
+32:       <div class="bg-light-background dark:bg-gray-700 rounded-lg p-5 text-center flex flex-col items-center">
+33:         <div class="rounded-full p-3 mb-3" [ngClass]="{'bg-primary/10 dark:bg-primary/20': true}">
+34:           <ng-icon name="tablerMaximize" class="text-primary text-6xl"></ng-icon>
+35:         </div>
+36:         <h3 class="text-dark-text dark:text-white font-medium mb-1">Area</h3>
+37:         <p class="text-light-text dark:text-gray-300 text-xl font-bold">{{ property.stats.area }}</p>
+38:       </div>
+39:     </div>
+40:   `
+41: })
+42: export class PropertyStatsComponent {
+43:   @Input() property!: Property;
+44: }
 </file>
 
-<file path="src/styles.css">
-  1: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Raleway:wght@300;400;500;600&display=swap');
-  2: @import 'tailwindcss';
-  3: :root {
-  4:   --color-primary: #74BA43;
-  5:   --color-success: #42758F;
-  6:   --color-warning: #EB6209;
-  7:   --color-dark-background: #3D3D3C;
-  8:   --color-light-background: #F0F5FF;
-  9:   --color-dark-text: #152542;
- 10:   --color-light-text: #3E547C;
- 11:   --font-family-0: 'Raleway', sans-serif;
- 12:   --font-family-1: 'Inter', sans-serif;
- 13:   font-family: var(--font-family-1), Avenir, Helvetica, Arial, sans-serif;
- 14:   font-size: 16px;
- 15:   line-height: 24px;
- 16:   font-weight: 400;
- 17:   color: var(--color-dark-text);
- 18:   background-color: #f8f9fa;
- 19:   font-synthesis: none;
- 20:   text-rendering: optimizeLegibility;
- 21:   -webkit-font-smoothing: antialiased;
- 22:   -moz-osx-font-smoothing: grayscale;
- 23:   -webkit-text-size-adjust: 100%;
- 24: }
- 25: body {
- 26:   margin: 0;
- 27:   min-width: 320px;
- 28:   min-height: 100vh;
- 29: }
- 30: h1, h2, h3, h4, h5, h6 {
- 31:   font-family: var(--font-family-1);
- 32:   color: var(--color-dark-text);
- 33:   line-height: 1.3;
- 34: }
- 35: h1 {
- 36:   font-size: 2.5rem;
- 37:   font-weight: 500;
- 38: }
- 39: h2 {
- 40:   font-size: 2rem;
- 41:   font-weight: 400;
- 42: }
- 43: h3 {
- 44:   font-size: 1.5rem;
- 45:   font-weight: 400;
- 46: }
- 47: p {
- 48:   color: var(--color-light-text);
- 49:   line-height: 1.6;
- 50: }
- 51: a.primary {
- 52:   font-weight: 500;
- 53:   color: var(--color-primary);
- 54:   text-decoration: inherit;
- 55: }
- 56: a:hover {
- 57:   opacity: 0.9;
- 58: }
- 59: button {
- 60:   border-radius: 8px;
- 61:   border: 1px solid transparent;
- 62:   padding: 0.6em 1.2em;
- 63:   font-size: 1em;
- 64:   font-weight: 500;
- 65:   font-family: var(--font-family-1);
- 66:   background-color: var(--color-primary);
- 67:   color: white;
- 68:   cursor: pointer;
- 69:   transition: opacity 0.25s;
- 70: }
- 71: button:hover {
- 72:   opacity: 0.9;
- 73: }
- 74: button:focus,
- 75: button:focus-visible {
- 76:   outline: 4px auto var(--color-primary);
- 77: }
- 78: .bg-primary {
- 79:   background-color: var(--color-primary);
- 80: }
- 81: .text-primary {
- 82:   color: var(--color-primary);
- 83: }
- 84: .border-primary {
- 85:   border-color: var(--color-primary);
- 86: }
- 87: .bg-success {
- 88:   background-color: var(--color-success);
- 89: }
- 90: .text-success {
- 91:   color: var(--color-success);
- 92: }
- 93: .bg-warning {
- 94:   background-color: var(--color-warning);
- 95: }
- 96: .text-warning {
- 97:   color: var(--color-warning);
- 98: }
- 99: .bg-dark-background {
-100:   background-color: var(--color-dark-background);
-101: }
-102: .text-dark-text {
-103:   color: var(--color-dark-text);
-104: }
-105: .text-light-text {
-106:   color: var(--color-light-text);
-107: }
-108: .bg-light-background {
-109:   background-color: var(--color-light-background);
-110: }
+<file path="src/app/components/room-details.component.ts">
+  1: import {
+  2:   Component,
+  3:   Input,
+  4:   OnChanges,
+  5:   SimpleChanges,
+  6:   signal,
+  7:   inject,
+  8:   ChangeDetectorRef,
+  9: } from '@angular/core';
+ 10: import { CommonModule } from '@angular/common';
+ 11: import { Room } from '../models/room.model';
+ 12: import { RoomService } from '../services/room.service';
+ 13: import { NgIcon } from '@ng-icons/core';
+ 14: @Component({
+ 15:   selector: 'app-room-details',
+ 16:   standalone: true,
+ 17:   imports: [CommonModule, NgIcon],
+ 18:   template: `
+ 19:     <!-- Loading State -->
+ 20:     <div *ngIf="loading()" class="flex justify-center items-center py-16">
+ 21:       <div
+ 22:         class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"
+ 23:       ></div>
+ 24:     </div>
+ 25:     <!-- Room Details Content -->
+ 26:     <div *ngIf="!loading() && room()" class="w-full">
+ 27:       <h3
+ 28:         class="text-xl font-medium text-dark-text dark:text-white mb-4 flex items-center"
+ 29:       >
+ 30:         {{ room()?.name }}
+ 31:       </h3>
+ 32:       <p
+ 33:         class="text-light-text dark:text-gray-300 mb-6 leading-relaxed text-left"
+ 34:       >
+ 35:         {{ room()?.description }}
+ 36:       </p>
+ 37:       <!-- Room Photos with Progressive Loading -->
+ 38:       <div class="mb-8">
+ 39:         <h4 class="text-lg font-medium text-dark-text dark:text-white mb-3">
+ 40:           Room Photos
+ 41:         </h4>
+ 42:         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+ 43:           <div
+ 44:             *ngFor="let photo of roomPhotos()"
+ 45:             class="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden h-56 relative"
+ 46:           >
+ 47:             <!-- Low-res background image (loads instantly) -->
+ 48:             <img
+ 49:               *ngIf="photo.lowRes"
+ 50:               [src]="photo.lowRes"
+ 51:               [alt]="room()?.name"
+ 52:               class="w-full h-full object-cover absolute inset-0 transition-opacity duration-300"
+ 53:               [class.opacity-0]="photo.highResLoaded"
+ 54:             />
+ 55:             <!-- High-res image (lazy loaded) -->
+ 56:             <img
+ 57:               *ngIf="photo.highRes"
+ 58:               [src]="photo.highRes"
+ 59:               [alt]="room()?.name"
+ 60:               class="w-full h-full object-cover absolute inset-0 transition-opacity duration-500"
+ 61:               [class.opacity-100]="photo.highResLoaded"
+ 62:               [class.opacity-0]="!photo.highResLoaded"
+ 63:               (load)="onHighResImageLoaded(photo)"
+ 64:               loading="lazy"
+ 65:             />
+ 66:           </div>
+ 67:         </div>
+ 68:       </div>
+ 69:       <!-- Room Features -->
+ 70:       <div
+ 71:         *ngIf="room()?.features && (room()?.features)!.length > 0"
+ 72:         class="bg-light-background dark:bg-gray-700 rounded-lg p-6"
+ 73:       >
+ 74:         <h4 class="text-lg font-medium text-dark-text dark:text-white mb-4">
+ 75:           Features
+ 76:         </h4>
+ 77:         <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+ 78:           <li
+ 79:             *ngFor="let feature of room()?.features"
+ 80:             class="flex text-left items-center"
+ 81:           >
+ 82:             <div
+ 83:               class="flex-shrink-0 rounded-full p-2 mr-3 bg-primary/10 dark:bg-primary/20"
+ 84:             >
+ 85:               <ng-icon
+ 86:                 name="tablerCheck"
+ 87:                 class="text-primary  text-2xl"
+ 88:               ></ng-icon>
+ 89:             </div>
+ 90:             <span class="text-light-text dark:text-gray-300 text-base">{{
+ 91:               feature
+ 92:             }}</span>
+ 93:           </li>
+ 94:         </ul>
+ 95:       </div>
+ 96:     </div>
+ 97:     <!-- Empty/Not Selected State -->
+ 98:     <div
+ 99:       *ngIf="!loading() && !room()"
+100:       class="w-full text-center py-12 px-4 bg-light-background dark:bg-gray-700 rounded-lg"
+101:     >
+102:       <ng-icon
+103:         name="tablerInfoCircle"
+104:         class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+105:       ></ng-icon>
+106:       <p class="text-light-text dark:text-gray-300">
+107:         Select a room from the floorplan to view details
+108:       </p>
+109:     </div>
+110:   `,
+111: })
+112: export class RoomDetailsComponent implements OnChanges {
+113:   @Input() roomId: string = '';
+114:   room = signal<Room | null>(null);
+115:   loading = signal<boolean>(false);
+116:   roomPhotos = signal<
+117:     { highRes: string; lowRes: string; highResLoaded: boolean }[]
+118:   >([]);
+119:   private roomService = inject(RoomService);
+120:   private cdr = inject(ChangeDetectorRef);
+121:   ngOnChanges(changes: SimpleChanges): void {
+122:     if (changes['roomId'] && this.roomId) {
+123:       this.loadRoomData(this.roomId);
+124:     }
+125:   }
+126:   private loadRoomData(id: string): void {
+127:     this.loading.set(true);
+128:     this.roomService.getRoom(id).subscribe({
+129:       next: (roomData) => {
+130:         this.room.set(roomData);
+131:         const photos = roomData.photos.map((photo) => ({
+132:           highRes: photo,
+133:           lowRes: photo,
+134:           highResLoaded: false,
+135:         }));
+136:         this.roomPhotos.set(photos);
+137:         this.loading.set(false);
+138:         this.cdr.detectChanges();
+139:       },
+140:       error: (error) => {
+141:         console.error('Error loading room data:', error);
+142:         this.room.set(null);
+143:         this.loading.set(false);
+144:       },
+145:     });
+146:   }
+147:   onHighResImageLoaded(photo: {
+148:     highRes: string;
+149:     lowRes: string;
+150:     highResLoaded: boolean;
+151:   }): void {
+152:     photo.highResLoaded = true;
+153:     this.cdr.detectChanges();
+154:   }
+155: }
+</file>
+
+<file path="src/app/pages/property/[id].page.ts">
+  1: import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
+  2: import { CommonModule, NgClass } from '@angular/common';
+  3: import { ActivatedRoute, RouterLink } from '@angular/router';
+  4: import { switchMap } from 'rxjs/operators';
+  5: import { PropertyService } from '../../services/property.service';
+  6: import { RoomService } from '../../services/room.service';
+  7: import { Property } from '../../models/property.model';
+  8: import { Room } from '../../models/room.model';
+  9: import { PropertyStatsComponent } from '../../components/property-stats.component';
+ 10: import { FloorPlanComponent } from '../../components/floor-plan.component';
+ 11: import { RoomDetailsComponent } from '../../components/room-details.component';
+ 12: import { NgIcon } from '@ng-icons/core';
+ 13: @Component({
+ 14:   selector: 'app-property-detail',
+ 15:   standalone: true,
+ 16:   imports: [
+ 17:     CommonModule,
+ 18:     NgClass,
+ 19:     PropertyStatsComponent,
+ 20:     FloorPlanComponent,
+ 21:     RoomDetailsComponent,
+ 22:     RouterLink,
+ 23:     NgIcon
+ 24:   ],
+ 25:   template: `
+ 26:     <!-- Loading State -->
+ 27:     <div *ngIf="isLoading" class="flex justify-center items-center py-24">
+ 28:       <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+ 29:     </div>
+ 30:     <!-- Property Detail Content -->
+ 31:     <div *ngIf="!isLoading && property" class="bg-light-background dark:bg-gray-800 pb-16">
+ 32:       <!-- Property Header -->
+ 33:       <div class="bg-white dark:bg-gray-900 shadow-md py-8">
+ 34:         <div class="container mx-auto px-4">
+ 35:           <!-- Breadcrumbs -->
+ 36:           <div class="flex items-center text-sm mb-4">
+ 37:             <a routerLink="/" class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Home</a>
+ 38:             <ng-icon name="tablerChevronRight" class="h-4 w-4 mx-2 text-gray-400"></ng-icon>
+ 39:             <span class="text-primary">{{ property.title }}</span>
+ 40:           </div>
+ 41:           <!-- Property Title & Price -->
+ 42:           <div class="text-center mb-4">
+ 43:             <h1 class="text-3xl md:text-4xl font-medium text-dark-text dark:text-white mb-2">{{ property.title }}</h1>
+ 44:             <p class="text-light-text dark:text-gray-300 text-lg">{{ property.address }}</p>
+ 45:             <p class="text-primary text-3xl md:text-4xl font-medium mt-4">{{ property.price }}</p>
+ 46:           </div>
+ 47:         </div>
+ 48:       </div>
+ 49:       <!-- Main Content -->
+ 50:       <div class="container mx-auto px-4 -mt-6">
+ 51:         <!-- Property Gallery -->
+ 52:         <div class="mb-8 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
+ 53:           <div class="h-64 sm:h-80 md:h-96 lg:h-112 bg-gray-200 dark:bg-gray-800">
+ 54:             <img [src]="property.thumbnail" [alt]="property.title" class="w-full h-full object-cover">
+ 55:           </div>
+ 56:         </div>
+ 57:         <!-- Property Stats Card -->
+ 58:         <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 mb-8">
+ 59:           <h2 class="text-2xl font-medium text-dark-text dark:text-white mb-6">Property Overview</h2>
+ 60:           <app-property-stats [property]="property"></app-property-stats>
+ 61:           <!-- Property Description -->
+ 62:           <div class="mt-8">
+ 63:             <h3 class="text-xl font-medium text-dark-text dark:text-white mb-4">About this property</h3>
+ 64:             <p class="text-light-text dark:text-gray-300 leading-relaxed">{{ property.description }}</p>
+ 65:           </div>
+ 66:         </div>
+ 67:         <!-- Floorplan & Room Details Section -->
+ 68:         <div *ngIf="!isLoading && rooms.length > 0" class="flex flex-col lg:flex-row gap-8 mb-12">
+ 69:           <!-- Floorplan Column -->
+ 70:           <div class="w-full lg:w-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+ 71:             <app-floor-plan
+ 72:               [rooms]="rooms"
+ 73:               [activeRoom]="selectedRoomId()"
+ 74:               [floorplanImage]="property.floorplan.image"
+ 75:               [orientation]="property.floorplan.orientation"
+ 76:               (roomSelected)="onRoomSelected($event)">
+ 77:             </app-floor-plan>
+ 78:           </div>
+ 79:           <!-- Room Details Column -->
+ 80:           <div class="w-full lg:w-1/2 bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+ 81:             <app-room-details [roomId]="selectedRoomId()"></app-room-details>
+ 82:           </div>
+ 83:         </div>
+ 84:         <!-- Contact/CTA Section -->
+ 85:         <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-8 text-center">
+ 86:           <h2 class="text-2xl font-medium text-dark-text dark:text-white mb-4">Interested in this property?</h2>
+ 87:           <p class="text-light-text dark:text-gray-300 max-w-2xl mx-auto mb-6">Schedule a viewing or get more information about this property by contacting our agents.</p>
+ 88:           <div class="flex flex-col sm:flex-row justify-center gap-4">
+ 89:             <button class="text-white px-6 py-3 rounded-lg flex items-center justify-center transition-opacity" [ngClass]="{'bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary': true}">
+ 90:               <ng-icon name="tablerPhone" class="mr-2 text-2xl"></ng-icon>
+ 91:               Contact Agent
+ 92:             </button>
+ 93:             <button class="border border-primary text-white dark:text-white px-6 py-3 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors">
+ 94:               <ng-icon name="tablerCalendarEvent" class="mr-2 text-2xl"></ng-icon>
+ 95:               Schedule Viewing
+ 96:             </button>
+ 97:           </div>
+ 98:         </div>
+ 99:       </div>
+100:     </div>
+101:     <!-- Error State -->
+102:     <div *ngIf="!isLoading && !property" class="container mx-auto px-4 py-24 text-center">
+103:       <ng-icon name="tablerMoodSad" class="h-16 w-16 mx-auto text-gray-300 mb-4"></ng-icon>
+104:       <h2 class="text-2xl font-medium text-dark-text dark:text-white mb-4">Property Not Found</h2>
+105:       <p class="text-light-text dark:text-gray-300 mb-8">The property you're looking for doesn't exist or has been removed.</p>
+106:       <a routerLink="/" class="text-white px-6 py-3 rounded-lg inline-flex items-center transition-opacity" [ngClass]="{'bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary': true}">
+107:         <ng-icon name="tablerChevronLeft" class="mr-2"></ng-icon>
+108:         Back to Home
+109:       </a>
+110:     </div>
+111:   `
+112: })
+113: export default class PropertyDetailPage implements OnInit {
+114:   property?: Property;
+115:   rooms: Room[] = [];
+116:   selectedRoomId = signal('');
+117:   isLoading: boolean = true;
+118:   constructor(
+119:     private route: ActivatedRoute,
+120:     private propertyService: PropertyService,
+121:     private roomService: RoomService,
+122:     private cdr: ChangeDetectorRef
+123:   ) {}
+124:   ngOnInit(): void {
+125:     this.loadPropertyData();
+126:   }
+127:   loadPropertyData(): void {
+128:     this.isLoading = true;
+129:     this.route.paramMap.pipe(
+130:       switchMap(params => {
+131:         const id = params.get('id') ?? '';
+132:         return this.propertyService.getProperty(id);
+133:       })
+134:     ).subscribe({
+135:       next: (property) => {
+136:         this.property = property;
+137:         // Once we have the property, load the rooms
+138:         this.roomService.getRoomsByPropertyId(property.id).subscribe({
+139:           next: (rooms) => {
+140:             this.rooms = rooms;
+141:             if (rooms.length > 0) {
+142:               // Set the signal value
+143:               this.selectedRoomId.set(rooms[0].id);
+144:             }
+145:             this.isLoading = false;
+146:             // Ensure proper change detection
+147:             this.cdr.detectChanges();
+148:           },
+149:           error: (error) => {
+150:             console.error('Error loading rooms data:', error);
+151:             this.isLoading = false;
+152:           }
+153:         });
+154:       },
+155:       error: (error) => {
+156:         console.error('Error loading property data:', error);
+157:         this.isLoading = false;
+158:       }
+159:     });
+160:   }
+161:   onRoomSelected(roomId: string): void {
+162:     this.selectedRoomId.set(roomId);
+163:     this.cdr.detectChanges();
+164:   }
+165: }
 </file>
 
 <file path="vite.config.ts">
@@ -1399,67 +1234,390 @@ This section contains the contents of the repository's files.
 27: }));
 </file>
 
-<file path="package.json">
- 1: {
- 2:   "name": "house-showcase",
- 3:   "version": "0.0.0",
- 4:   "type": "module",
- 5:   "engines": {
- 6:     "node": ">=18.19.1"
- 7:   },
- 8:   "scripts": {
- 9:     "start": "npm run dev",
-10:     "mix": "npx repomix",
-11:     "ng": "ng",
-12:     "dev": "ng serve",
-13:     "build": "ng build",
-14:     "watch": "ng build --watch --configuration development",
-15:     "test": "ng test"
-16:   },
-17:   "private": true,
-18:   "dependencies": {
-19:     "@analogjs/content": "^1.16.1",
-20:     "@analogjs/router": "^1.16.1",
-21:     "@angular/animations": "^19.0.0",
-22:     "@angular/common": "^19.0.0",
-23:     "@angular/compiler": "^19.0.0",
-24:     "@angular/core": "^19.0.0",
-25:     "@angular/forms": "^19.0.0",
-26:     "@angular/platform-browser": "^19.0.0",
-27:     "@angular/platform-browser-dynamic": "^19.0.0",
-28:     "@angular/platform-server": "^19.0.0",
-29:     "@angular/router": "^19.0.0",
-30:     "front-matter": "^4.0.2",
-31:     "marked": "^15.0.7",
-32:     "marked-gfm-heading-id": "^4.1.1",
-33:     "marked-highlight": "^2.2.1",
-34:     "marked-mangle": "^1.1.10",
-35:     "prismjs": "^1.29.0",
-36:     "rxjs": "~7.8.0",
-37:     "tslib": "^2.3.0",
-38:     "zone.js": "~0.15.0"
-39:   },
-40:   "devDependencies": {
-41:     "@analogjs/platform": "^1.16.1",
-42:     "@analogjs/vite-plugin-angular": "^1.16.1",
-43:     "@analogjs/vitest-angular": "^1.16.1",
-44:     "@angular-devkit/build-angular": "^19.0.0",
-45:     "@angular/build": "^19.0.0",
-46:     "@angular/cli": "^19.0.0",
-47:     "@angular/compiler-cli": "^19.0.0",
-48:     "@tailwindcss/vite": "^4.1.7",
-49:     "autoprefixer": "^10.4.21",
-50:     "jsdom": "^22.0.0",
-51:     "postcss": "^8.5.3",
-52:     "sharp": "^0.33.5",
-53:     "tailwindcss": "^4.1.7",
-54:     "typescript": "~5.8.0",
-55:     "vite": "^6.0.0",
-56:     "vite-plugin-devtools-json": "^0.1.0",
-57:     "vite-tsconfig-paths": "^4.2.0",
-58:     "vitest": "^3.0.0"
-59:   }
-60: }
+<file path="src/app/components/layout.component.ts">
+  1: import { Component, signal, OnInit, inject } from '@angular/core';
+  2: import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+  3: import { CommonModule } from '@angular/common';
+  4: import { ThemeService } from '../services/theme.service';
+  5: import { NgIcon } from '@ng-icons/core';
+  6: @Component({
+  7:   selector: 'app-layout',
+  8:   standalone: true,
+  9:   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, NgIcon],
+ 10:   template: `
+ 11:     <!-- Header -->
+ 12:     <header class="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50">
+ 13:       <div
+ 14:         class="container mx-auto px-4 py-3 flex justify-between items-center"
+ 15:       >
+ 16:         <a routerLink="/" class="flex flex-row justify-start items-start relative">
+ 17:           <svg
+ 18:             width="150"
+ 19:             height="42"
+ 20:             viewBox="0 0 698 192"
+ 21:             xmlns="http://www.w3.org/2000/svg"
+ 22:           >
+ 23:             <g
+ 24:               transform="matrix(1.333333, 0, 0, -1.333333, -53.881176, 793.701355)"
+ 25:             >
+ 26:               <g transform="matrix(1, 0, 0, 1, 0, 227.155548)">
+ 27:                 <g>
+ 28:                   <path
+ 29:                     d="m 0,0 c -24.707,2.223 -44.073,22.975 -44.073,48.26 0,26.768 21.7,48.468 48.468,48.468 25.286,0 46.039,-19.366 48.26,-44.073 h 14.637 c -2.258,32.778 -29.545,58.673 -62.897,58.673 -34.831,0 -63.067,-28.237 -63.067,-63.068 0,-33.352 25.895,-60.639 58.673,-62.897 z"
+ 30:                     style="fill:#444443;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 31:                     transform="translate(106.5829,249.2926)"
+ 32:                   />
+ 33:                   <path
+ 34:                     d="M 0,0 C -2.092,-23.259 -20.607,-41.774 -43.866,-43.866 V -58.503 C -12.541,-56.345 12.479,-31.325 14.637,0 Z"
+ 35:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 36:                     transform="translate(159.2381,293.1588)"
+ 37:                   />
+ 38:                   <path
+ 39:                     d="M 0,0 V 65.819 H 43.848 V 56.642 H 10.382 V 36.988 H 38.378 V 28.366 H 10.382 L 10.382,0 Z"
+ 40:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 41:                     transform="translate(210.5292,284.8434)"
+ 42:                   />
+ 43:                   <path
+ 44:                     d="m 0,0 h 18.17 c 1.482,0 2.828,0.324 4.033,0.972 1.205,0.65 2.238,1.545 3.105,2.69 0.865,1.143 1.544,2.456 2.039,3.939 0.494,1.484 0.742,3.059 0.742,4.729 0,1.668 -0.295,3.243 -0.881,4.727 -0.588,1.483 -1.359,2.78 -2.317,3.893 -0.958,1.112 -2.071,1.993 -3.337,2.643 -1.268,0.648 -2.582,0.973 -3.94,0.973 L 0,24.566 Z m -10.382,-32.075 v 65.819 h 28.645 c 2.966,0 5.7,-0.619 8.203,-1.855 2.504,-1.237 4.65,-2.859 6.443,-4.866 1.793,-2.009 3.198,-4.297 4.218,-6.86 1.02,-2.566 1.529,-5.178 1.529,-7.833 0,-2.226 -0.309,-4.358 -0.926,-6.397 C 37.112,3.893 36.246,2.007 35.134,0.278 34.021,-1.453 32.662,-2.953 31.056,-4.218 29.448,-5.486 27.687,-6.429 25.771,-7.046 L 41.253,-32.075 H 29.479 L 15.203,-9.179 H 0 v -22.896 z"
+ 45:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 46:                     transform="translate(288.4901,316.9186)"
+ 47:                   />
+ 48:                   <path
+ 49:                     d="M 0,0 V -9.177 H -45.146 V 56.642 H -0.835 V 47.465 H -34.764 V 28.739 H -5.377 V 20.117 H -34.764 V 0 Z"
+ 50:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 51:                     transform="translate(398.4354,294.0202)"
+ 52:                   />
+ 53:                   <path
+ 54:                     d="m 0,0 c -0.618,0.679 -1.515,1.405 -2.688,2.178 -1.173,0.772 -2.548,1.499 -4.125,2.179 -1.576,0.679 -3.307,1.236 -5.191,1.668 -1.887,0.432 -3.817,0.649 -5.795,0.649 -4.388,0 -7.617,-0.803 -9.686,-2.409 -2.073,-1.608 -3.106,-3.833 -3.106,-6.675 0,-1.608 0.323,-2.921 0.974,-3.941 0.649,-1.02 1.652,-1.916 3.013,-2.688 1.358,-0.773 3.058,-1.453 5.097,-2.039 2.04,-0.588 4.418,-1.221 7.14,-1.901 3.337,-0.804 6.348,-1.7 9.038,-2.688 2.687,-0.989 4.959,-2.194 6.813,-3.615 1.854,-1.423 3.291,-3.168 4.311,-5.238 1.018,-2.071 1.529,-4.589 1.529,-7.556 0,-3.337 -0.634,-6.21 -1.9,-8.62 -1.268,-2.412 -2.998,-4.374 -5.191,-5.887 -2.196,-1.516 -4.745,-2.628 -7.648,-3.338 -2.905,-0.709 -6.026,-1.066 -9.364,-1.066 -5.005,0 -9.842,0.756 -14.508,2.271 -4.666,1.513 -8.884,3.723 -12.653,6.629 l 4.727,8.899 c 0.802,-0.804 1.961,-1.701 3.477,-2.688 1.514,-0.989 3.275,-1.901 5.284,-2.736 2.007,-0.833 4.185,-1.544 6.535,-2.131 2.349,-0.589 4.79,-0.881 7.324,-0.881 4.078,0 7.231,0.71 9.455,2.133 2.226,1.421 3.338,3.523 3.338,6.303 0,1.669 -0.417,3.06 -1.252,4.172 -0.834,1.112 -2.025,2.086 -3.568,2.921 -1.546,0.833 -3.43,1.589 -5.655,2.271 -2.225,0.678 -4.76,1.39 -7.602,2.132 -3.277,0.864 -6.135,1.776 -8.575,2.734 -2.443,0.958 -4.466,2.117 -6.071,3.476 -1.609,1.359 -2.829,2.95 -3.664,4.774 -0.833,1.822 -1.251,4.033 -1.251,6.628 0,3.213 0.618,6.073 1.855,8.576 1.235,2.503 2.921,4.603 5.053,6.304 2.131,1.699 4.648,2.981 7.553,3.846 2.906,0.865 6.057,1.298 9.457,1.298 4.45,0 8.559,-0.711 12.33,-2.132 3.767,-1.422 7.076,-3.183 9.919,-5.285 z"
+ 55:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 56:                     transform="translate(460.6376,335.1808)"
+ 57:                   />
+ 58:                   <path
+ 59:                     d="m 0,0 v -65.819 h -10.477 v 29.016 H -43.663 V -65.819 H -54.045 V 0 h 10.382 v -27.533 h 33.186 V 0 Z"
+ 60:                     style="fill:#79b935;fill-opacity:1;fill-rule:nonzero;stroke:none"
+ 61:                     transform="translate(546.2958,350.6623)"
+ 62:                   />
+ 63:                 </g>
+ 64:               </g>
+ 65:             </g>
+ 66:           </svg>
+ 67:           <span class="ml-2 text-lg tracking-[0.4em] font-light text-dark-text dark:text-white absolute top-5 left-10">Spaces</span>
+ 68:         </a>
+ 69:         <!-- Desktop Navigation -->
+ 70:         <nav class="hidden md:flex items-center">
+ 71:           <ul class="flex space-x-8">
+ 72:             <li>
+ 73:               <a
+ 74:                 routerLink="/"
+ 75:                 routerLinkActive="text-primary font-medium"
+ 76:                 [routerLinkActiveOptions]="{ exact: true }"
+ 77:                 class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+ 78:               >
+ 79:                 Home
+ 80:               </a>
+ 81:             </li>
+ 82:             <li>
+ 83:               <a
+ 84:                 routerLink="/"
+ 85:                 class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+ 86:               >
+ 87:                 Listings
+ 88:               </a>
+ 89:             </li>
+ 90:             <li>
+ 91:               <a
+ 92:                 href="#"
+ 93:                 class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+ 94:               >
+ 95:                 Contact
+ 96:               </a>
+ 97:             </li>
+ 98:           </ul>
+ 99:           <!-- Dark mode toggle -->
+100:           <div class="ml-8 flex items-center">
+101:             <button
+102:               class="flex items-center bg-gray-200 dark:bg-gray-600 rounded-full px-1 py-1 w-14 h-7 transition-colors duration-300"
+103:               (click)="toggleTheme()"
+104:             >
+105:               <div class="flex justify-between items-center w-full px-1">
+106:                 <!-- Sun icon for light mode -->
+107:                 <ng-icon
+108:                   name="tablerSun"
+109:                   class="h-4 w-4 text-white"
+110:                 ></ng-icon>
+111:                 <!-- Moon icon for dark mode -->
+112:                 <ng-icon
+113:                   name="tablerMoon"
+114:                   class="h-4 w-4 text-white"
+115:                 ></ng-icon>
+116:                 <!-- Toggle indicator -->
+117:                 <div
+118:                   class="bg-white dark:bg-dark-background rounded-full h-5 w-5 transform transition-transform duration-300"
+119:                   [ngClass]="{'translate-x-7': isDarkMode()}"
+120:                 ></div>
+121:               </div>
+122:             </button>
+123:           </div>
+124:         </nav>
+125:         <!-- Mobile menu button -->
+126:         <button
+127:           class="md:hidden flex items-center ext-white"
+128:           (click)="toggleMobileMenu()"
+129:         >
+130:           <ng-icon name="tablerMenu2" class="h-6 w-6"></ng-icon>
+131:         </button>
+132:       </div>
+133:       <!-- Mobile Navigation Menu -->
+134:       <div
+135:         *ngIf="isMobileMenuOpen()"
+136:         class="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-4 px-4 shadow-md"
+137:       >
+138:         <ul class="space-y-4">
+139:           <li>
+140:             <a
+141:               routerLink="/"
+142:               routerLinkActive="text-primary font-medium"
+143:               [routerLinkActiveOptions]="{ exact: true }"
+144:               class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+145:               (click)="closeMobileMenu()"
+146:             >
+147:               Home
+148:             </a>
+149:           </li>
+150:           <li>
+151:             <a
+152:               routerLink="/"
+153:               class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+154:               (click)="closeMobileMenu()"
+155:             >
+156:               Listings
+157:             </a>
+158:           </li>
+159:           <li>
+160:             <a
+161:               href="#"
+162:               class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200"
+163:               (click)="closeMobileMenu()"
+164:             >
+165:               Contact
+166:             </a>
+167:           </li>
+168:           <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+169:             <div class="flex items-center justify-between">
+170:               <span class="text-light-text dark:text-gray-300">Dark Mode</span>
+171:               <button
+172:                 class="flex items-center bg-gray-200 dark:bg-gray-600 rounded-full px-1 py-1 w-14 h-7 transition-colors duration-300"
+173:                 (click)="toggleTheme()"
+174:               >
+175:                 <div class="flex justify-between items-center w-full px-1">
+176:                   <!-- Sun icon -->
+177:                   <ng-icon
+178:                     name="tablerSun"
+179:                     class="h-4 w-4 text-yellow-500"
+180:                   ></ng-icon>
+181:                   <!-- Moon icon -->
+182:                   <ng-icon
+183:                     name="tablerMoon"
+184:                     class="h-4 w-4 text-indigo-200"
+185:                   ></ng-icon>
+186:                   <!-- Toggle indicator -->
+187:                   <div
+188:                     class="bg-white dark:bg-dark-background rounded-full h-5 w-5 transform transition-transform duration-300"
+189:                     [ngClass]="{'translate-x-7': isDarkMode()}"
+190:                   ></div>
+191:                 </div>
+192:               </button>
+193:             </div>
+194:           </li>
+195:         </ul>
+196:       </div>
+197:     </header>
+198:     <main class="min-h-screen">
+199:       <router-outlet></router-outlet>
+200:     </main>
+201:     <!-- Footer -->
+202:     <footer class="bg-dark-background text-white py-8 mt-12">
+203:       <div class="container mx-auto px-4">
+204:         <div class="flex flex-col md:flex-row justify-between items-center">
+205:           <div class="flex flex-col justify-start items-start mb-4 md:mb-0">
+206:             <a href="/" class="flex items-center">
+207:               <span class="text-xl font-medium text-primary"
+208:                 >Fresh Projects</span
+209:               >
+210:               <span class="ml-2 text-xl font-medium text-white">Spaces</span>
+211:             </a>
+212:             <span class="text-gray-200 mt-2">Find your perfect home</span>
+213:           </div>
+214:           <div
+215:             class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-8"
+216:           >
+217:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
+218:               >About Us</a
+219:             >
+220:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
+221:               >Terms of Service</a
+222:             >
+223:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
+224:               >Privacy Policy</a
+225:             >
+226:             <a href="#" class="text-gray-300 hover:text-white transition-colors"
+227:               >Contact</a
+228:             >
+229:           </div>
+230:         </div>
+231:         <div
+232:           class="mt-8 pt-8 border-t border-gray-800 text-center md:text-right"
+233:         >
+234:           <span class="text-gray-400">
+235:             &copy; 2025 Fresh Projects Spaces. All rights reserved.
+236:           </span>
+237:         </div>
+238:       </div>
+239:     </footer>
+240:   `,
+241: })
+242: export class LayoutComponent implements OnInit {
+243:   private mobileMenuOpen = signal(false);
+244:   private themeService = inject(ThemeService);
+245:   ngOnInit() {
+246:   }
+247:   isDarkMode() {
+248:     return this.themeService.darkMode;
+249:   }
+250:   toggleTheme() {
+251:     this.themeService.toggleTheme();
+252:   }
+253:   isMobileMenuOpen() {
+254:     return this.mobileMenuOpen();
+255:   }
+256:   toggleMobileMenu() {
+257:     this.mobileMenuOpen.update(value => !value);
+258:   }
+259:   closeMobileMenu() {
+260:     this.mobileMenuOpen.set(false);
+261:   }
+262: }
+</file>
+
+<file path="src/app/pages/index.page.ts">
+  1: import { Component, OnInit, signal } from '@angular/core';
+  2: import { CommonModule, NgClass } from '@angular/common';
+  3: import { PropertyCardComponent } from '../components/property-card.component';
+  4: import { PropertyService } from '../services/property.service';
+  5: import { Property } from '../models/property.model';
+  6: import { FormsModule } from '@angular/forms';
+  7: import { NgIcon } from '@ng-icons/core';
+  8: @Component({
+  9:   selector: 'app-home',
+ 10:   standalone: true,
+ 11:   imports: [CommonModule, NgClass, PropertyCardComponent, FormsModule, NgIcon],
+ 12:   template: `
+ 13:     <div class="bg-light-background dark:bg-gray-800 py-16">
+ 14:       <div class="container mx-auto px-4">
+ 15:         <div class="text-center mb-12">
+ 16:           <h1 class="text-4xl md:text-5xl font-medium text-dark-text dark:text-white mb-4">Fresh Projects Spaces</h1>
+ 17:           <p class="text-light-text dark:text-gray-300 text-xl max-w-3xl mx-auto">Find your perfect home with our interactive property listings</p>
+ 18:         </div>
+ 19:         <!-- Search Box -->
+ 20:         <div class="max-w-4xl mx-auto mb-12">
+ 21:           <div class="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4 flex items-center">
+ 22:             <div class="relative flex-grow">
+ 23:               <input
+ 24:                 type="text"
+ 25:                 [(ngModel)]="searchQuery"
+ 26:                 (ngModelChange)="performSearch()"
+ 27:                 placeholder="Search properties by location, features..."
+ 28:                 class="w-full pl-10 pr-4 py-3 rounded-md border border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white dark:bg-gray-800 text-dark-text dark:text-white"
+ 29:               >
+ 30:               <ng-icon
+ 31:                 name="tablerSearch"
+ 32:                 class="h-5 w-5 text-gray-400 dark:text-gray-300 absolute left-3 top-1/2 transform -translate-y-1/2"
+ 33:               ></ng-icon>
+ 34:             </div>
+ 35:           </div>
+ 36:         </div>
+ 37:       </div>
+ 38:     </div>
+ 39:     <div class="container mx-auto px-4 py-12">
+ 40:       <!-- Featured Properties Heading -->
+ 41:       <div class="mb-8">
+ 42:         <h2 class="text-3xl font-medium text-dark-text dark:text-white mb-2">Featured Properties</h2>
+ 43:         <div class="w-20 h-1 bg-primary rounded-full"></div>
+ 44:       </div>
+ 45:       <!-- Loading State -->
+ 46:       <div *ngIf="loading" class="flex justify-center items-center py-16">
+ 47:         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+ 48:       </div>
+ 49:       <!-- No Properties State -->
+ 50:       <div *ngIf="!loading && filteredProperties().length === 0" class="text-center py-16">
+ 51:         <ng-icon
+ 52:           name="tablerHome"
+ 53:           class="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4"
+ 54:         ></ng-icon>
+ 55:         <p class="text-light-text dark:text-gray-300 text-lg">
+ 56:           {{ properties.length > 0 ? 'No properties match your search criteria.' : 'No properties available at the moment.' }}
+ 57:         </p>
+ 58:         <button
+ 59:           *ngIf="searchQuery && properties.length > 0"
+ 60:           (click)="clearSearch()"
+ 61:           class="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors duration-200"
+ 62:         >
+ 63:           Clear Search
+ 64:         </button>
+ 65:       </div>
+ 66:       <!-- Properties List -->
+ 67:       <div *ngIf="!loading && filteredProperties().length > 0">
+ 68:         <app-property-card *ngFor="let property of filteredProperties()" [property]="property"></app-property-card>
+ 69:       </div>
+ 70:     </div>
+ 71:   `
+ 72: })
+ 73: export default class HomePage implements OnInit {
+ 74:   properties: Property[] = [];
+ 75:   loading: boolean = true;
+ 76:   searchQuery: string = '';
+ 77:   private allProperties = signal<Property[]>([]);
+ 78:   filteredProperties = signal<Property[]>([]);
+ 79:   constructor(private propertyService: PropertyService) {}
+ 80:   ngOnInit(): void {
+ 81:     this.propertyService.getProperties().subscribe({
+ 82:       next: (properties) => {
+ 83:         this.properties = properties;
+ 84:         this.allProperties.set(properties);
+ 85:         this.filteredProperties.set(properties);
+ 86:         this.loading = false;
+ 87:       },
+ 88:       error: (error) => {
+ 89:         console.error('Error loading properties:', error);
+ 90:         this.loading = false;
+ 91:       }
+ 92:     });
+ 93:   }
+ 94:   performSearch(): void {
+ 95:     if (!this.searchQuery) {
+ 96:       this.filteredProperties.set(this.allProperties());
+ 97:       return;
+ 98:     }
+ 99:     const query = this.searchQuery.toLowerCase().trim();
+100:     const filtered = this.allProperties().filter(property => {
+101:       return (
+102:         property.title.toLowerCase().includes(query) ||
+103:         property.address.toLowerCase().includes(query) ||
+104:         property.description.toLowerCase().includes(query) ||
+105:         property.stats.type.toLowerCase().includes(query) ||
+106:         `${property.stats.bedrooms} bedroom`.includes(query) ||
+107:         `${property.stats.bathrooms} bathroom`.includes(query) ||
+108:         property.stats.area.toLowerCase().includes(query) ||
+109:         property.price.toLowerCase().includes(query)
+110:       );
+111:     });
+112:     this.filteredProperties.set(filtered);
+113:   }
+114:   clearSearch(): void {
+115:     this.searchQuery = '';
+116:     this.filteredProperties.set(this.allProperties());
+117:   }
+118: }
 </file>
 
 <file path="src/server/data/rooms.json">
@@ -1727,6 +1885,218 @@ This section contains the contents of the repository's files.
 262: ]
 </file>
 
+<file path="src/styles.css">
+  1: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Raleway:wght@300;400;500;600&display=swap');
+  2: @import 'tailwindcss';
+  3: :root {
+  4:   --color-primary: #74BA43;
+  5:   --color-success: #42758F;
+  6:   --color-warning: #EB6209;
+  7:   --color-dark-background: #3D3D3C;
+  8:   --color-light-background: #F0F5FF;
+  9:   --color-dark-text: #152542;
+ 10:   --color-light-text: #3E547C;
+ 11:   --font-family-0: 'Raleway', sans-serif;
+ 12:   --font-family-1: 'Inter', sans-serif;
+ 13:   font-family: var(--font-family-1), Avenir, Helvetica, Arial, sans-serif;
+ 14:   font-size: 16px;
+ 15:   line-height: 24px;
+ 16:   font-weight: 400;
+ 17:   color: var(--color-dark-text);
+ 18:   background-color: #f8f9fa;
+ 19:   font-synthesis: none;
+ 20:   text-rendering: optimizeLegibility;
+ 21:   -webkit-font-smoothing: antialiased;
+ 22:   -moz-osx-font-smoothing: grayscale;
+ 23:   -webkit-text-size-adjust: 100%;
+ 24: }
+ 25: @media (prefers-color-scheme: dark) {
+ 26:   :root:not(.dark) {
+ 27:     color-scheme: light;
+ 28:   }
+ 29: }
+ 30: .dark {
+ 31:   --color-light-background: #2e3440;
+ 32:   --color-dark-text: #e5e9f0;
+ 33:   --color-light-text: #d8dee9;
+ 34:   background-color: #1e2029;
+ 35:   color: #e5e9f0;
+ 36:   color-scheme: dark;
+ 37: }
+ 38: body {
+ 39:   margin: 0;
+ 40:   min-width: 320px;
+ 41:   min-height: 100vh;
+ 42: }
+ 43: h1, h2, h3, h4, h5, h6 {
+ 44:   font-family: var(--font-family-1);
+ 45:   color: var(--color-dark-text);
+ 46:   line-height: 1.3;
+ 47: }
+ 48: h1 {
+ 49:   font-size: 2.5rem;
+ 50:   font-weight: 500;
+ 51: }
+ 52: h2 {
+ 53:   font-size: 2rem;
+ 54:   font-weight: 400;
+ 55: }
+ 56: h3 {
+ 57:   font-size: 1.5rem;
+ 58:   font-weight: 400;
+ 59: }
+ 60: p {
+ 61:   color: var(--color-light-text);
+ 62:   line-height: 1.6;
+ 63: }
+ 64: a.primary {
+ 65:   font-weight: 500;
+ 66:   color: var(--color-primary);
+ 67:   text-decoration: inherit;
+ 68: }
+ 69: a:hover {
+ 70:   opacity: 0.9;
+ 71: }
+ 72: button {
+ 73:   border-radius: 8px;
+ 74:   border: 1px solid transparent;
+ 75:   padding: 0.6em 1.2em;
+ 76:   font-size: 1em;
+ 77:   font-weight: 500;
+ 78:   font-family: var(--font-family-1);
+ 79:   background-color: var(--color-primary);
+ 80:   color: white;
+ 81:   cursor: pointer;
+ 82:   transition: opacity 0.25s;
+ 83: }
+ 84: button:hover {
+ 85:   opacity: 0.9;
+ 86: }
+ 87: button:focus,
+ 88: button:focus-visible {
+ 89:   outline: 4px auto var(--color-primary);
+ 90: }
+ 91: .bg-primary {
+ 92:   background-color: var(--color-primary);
+ 93: }
+ 94: .text-primary {
+ 95:   color: var(--color-primary);
+ 96: }
+ 97: .border-primary {
+ 98:   border-color: var(--color-primary);
+ 99: }
+100: .bg-success {
+101:   background-color: var(--color-success);
+102: }
+103: .text-success {
+104:   color: var(--color-success);
+105: }
+106: .bg-warning {
+107:   background-color: var(--color-warning);
+108: }
+109: .text-warning {
+110:   color: var(--color-warning);
+111: }
+112: .bg-dark-background {
+113:   background-color: var(--color-dark-background);
+114: }
+115: .text-dark-text {
+116:   color: var(--color-dark-text);
+117: }
+118: .text-light-text {
+119:   color: var(--color-light-text);
+120: }
+121: .bg-light-background {
+122:   background-color: var(--color-light-background);
+123: }
+124: :root:not(.dark) .bg-white {
+125:   background-color: #ffffff !important;
+126: }
+127: .dark .bg-white {
+128:   background-color: #2e3440;
+129: }
+130: .dark .bg-light-background {
+131:   background-color: #3b4252;
+132: }
+133: .dark .text-dark-text {
+134:   color: #eceff4;
+135: }
+136: .dark .text-light-text {
+137:   color: #d8dee9;
+138: }
+139: .dark .shadow-md {
+140:   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+141: }
+142: .dark .border-gray-200 {
+143:   border-color: #4c566a;
+144: }
+</file>
+
+<file path="package.json">
+ 1: {
+ 2:   "name": "house-showcase",
+ 3:   "version": "0.0.0",
+ 4:   "type": "module",
+ 5:   "engines": {
+ 6:     "node": ">=18.19.1"
+ 7:   },
+ 8:   "scripts": {
+ 9:     "start": "npm run dev",
+10:     "mix": "npx repomix",
+11:     "ng": "ng",
+12:     "dev": "ng serve",
+13:     "build": "ng build",
+14:     "watch": "ng build --watch --configuration development",
+15:     "test": "ng test"
+16:   },
+17:   "private": true,
+18:   "dependencies": {
+19:     "@analogjs/content": "^1.16.1",
+20:     "@analogjs/router": "^1.16.1",
+21:     "@angular/animations": "^19.0.0",
+22:     "@angular/common": "^19.0.0",
+23:     "@angular/compiler": "^19.0.0",
+24:     "@angular/core": "^19.0.0",
+25:     "@angular/forms": "^19.0.0",
+26:     "@angular/platform-browser": "^19.0.0",
+27:     "@angular/platform-browser-dynamic": "^19.0.0",
+28:     "@angular/platform-server": "^19.0.0",
+29:     "@angular/router": "^19.0.0",
+30:     "@ng-icons/core": "^28.0.0",
+31:     "@ng-icons/tabler-icons": "^28.0.0",
+32:     "front-matter": "^4.0.2",
+33:     "marked": "^15.0.7",
+34:     "marked-gfm-heading-id": "^4.1.1",
+35:     "marked-highlight": "^2.2.1",
+36:     "marked-mangle": "^1.1.10",
+37:     "prismjs": "^1.29.0",
+38:     "rxjs": "~7.8.0",
+39:     "tslib": "^2.3.0",
+40:     "zone.js": "~0.15.0"
+41:   },
+42:   "devDependencies": {
+43:     "@analogjs/platform": "^1.16.1",
+44:     "@analogjs/vite-plugin-angular": "^1.16.1",
+45:     "@analogjs/vitest-angular": "^1.16.1",
+46:     "@angular-devkit/build-angular": "^19.0.0",
+47:     "@angular/build": "^19.0.0",
+48:     "@angular/cli": "^19.0.0",
+49:     "@angular/compiler-cli": "^19.0.0",
+50:     "@tailwindcss/vite": "^4.1.7",
+51:     "autoprefixer": "^10.4.21",
+52:     "jsdom": "^22.0.0",
+53:     "postcss": "^8.5.3",
+54:     "sharp": "^0.33.5",
+55:     "tailwindcss": "^4.1.7",
+56:     "typescript": "~5.8.0",
+57:     "vite": "^6.0.0",
+58:     "vite-plugin-devtools-json": "^0.1.0",
+59:     "vite-tsconfig-paths": "^4.2.0",
+60:     "vitest": "^3.0.0"
+61:   }
+62: }
+</file>
+
 <file path="src/app/components/floor-plan.component.ts">
   1: import {
   2:   Component,
@@ -1736,147 +2106,138 @@ This section contains the contents of the repository's files.
   6:   OnChanges,
   7:   SimpleChanges,
   8:   signal,
-  9:   computed,
- 10:   inject,
- 11:   ChangeDetectorRef,
- 12: } from '@angular/core';
- 13: import { CommonModule, NgClass } from '@angular/common';
- 14: import { Room } from '../models/room.model';
+  9:   inject,
+ 10:   ChangeDetectorRef,
+ 11: } from '@angular/core';
+ 12: import { CommonModule, NgClass } from '@angular/common';
+ 13: import { Room } from '../models/room.model';
+ 14: import { NgIcon } from '@ng-icons/core';
  15: @Component({
  16:   selector: 'app-floor-plan',
  17:   standalone: true,
- 18:   imports: [CommonModule, NgClass],
+ 18:   imports: [CommonModule, NgClass, NgIcon],
  19:   template: `
  20:     <div class="w-full">
- 21:       <h3 class="text-xl font-medium text-dark-text mb-4">
+ 21:       <h3 class="text-xl font-medium text-dark-text dark:text-white mb-4">
  22:         Interactive Floorplan
  23:       </h3>
- 24:       <div class="mb-6 px-4 py-3 bg-light-background rounded-lg text-center">
- 25:         <p class="text-sm text-light-text mb-0">
- 26:           <svg
- 27:             xmlns="http://www.w3.org/2000/svg"
- 28:             class="h-4 w-4 inline-block mr-1 text-primary"
- 29:             fill="none"
- 30:             viewBox="0 0 24 24"
- 31:             stroke="currentColor"
- 32:           >
- 33:             <path
- 34:               stroke-linecap="round"
- 35:               stroke-linejoin="round"
- 36:               stroke-width="2"
- 37:               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
- 38:             />
- 39:           </svg>
- 40:           Click on a room to view detailed information and photos
- 41:         </p>
- 42:       </div>
- 43:       <div
- 44:         [class.floorplan-horizontal]="orientation === 'horizontal'"
- 45:         [class.floorplan-vertical]="orientation === 'vertical'"
- 46:         class="floorplan-container w-full relative mx-auto rounded-lg overflow-hidden"
- 47:       >
- 48:         <!-- Floorplan Image -->
- 49:         <img
- 50:           [src]="floorplanImage"
- 51:           alt="Floorplan"
- 52:           class="w-full border border-gray-200 rounded-lg"
- 53:         />
- 54:         <!-- Clickable Room Areas with Integrated Labels -->
- 55:         <div
- 56:           *ngFor="let room of rooms"
- 57:           [style.left.%]="getPercentPosition(room.coordinates.x, true)"
- 58:           [style.top.%]="getPercentPosition(room.coordinates.y, false)"
- 59:           [style.width.%]="getPercentSize(room.coordinates.width, true)"
- 60:           [style.height.%]="getPercentSize(room.coordinates.height, false)"
- 61:           [ngClass]="{
- 62:             'bg-[#74BA43]/40': activeRoomSignal() === room.id,
- 63:             'border-[#74BA43]': activeRoomSignal() === room.id,
- 64:             'border-2': activeRoomSignal() === room.id,
- 65:             'bg-[#74BA43]/10': activeRoomSignal() !== room.id,
- 66:             'hover:bg-[#74BA43]/30': activeRoomSignal() !== room.id,
- 67:             'hover:border-[#74BA43]': activeRoomSignal() !== room.id,
- 68:             'border-[#74BA43]/30': activeRoomSignal() !== room.id,
- 69:             'hover:border-2': activeRoomSignal() !== room.id
- 70:           }"
- 71:           class="absolute cursor-pointer group p-1 transition-all duration-200 border rounded-md  flex flex-col items-start justify-start z-10"
- 72:           (click)="selectRoom(room.id)"
- 73:         >
- 74:           <!-- Integrated Room Label -->
- 75:           <div
- 76:             class="px-2 py-1 opacity-0 group-hover:opacity-100 bg-white rounded-full text-xs text-left flex-nowrap whitespace-nowrap font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start"
- 77:             [ngClass]="{  'opacity-100':activeRoomSignal() === room.id, }"
- 78:           >
- 79:             {{ room.name }}
- 80:           </div>
- 81:         </div>
- 82:       </div>
- 83:     </div>
- 84:   `,
- 85:   styles: [
- 86:     `
- 87:       .floorplan-container {
- 88:         max-width: 800px;
- 89:         margin: 0 auto;
- 90:         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
- 91:           0 2px 4px -1px rgba(0, 0, 0, 0.06);
- 92:       }
- 93:       .floorplan-horizontal {
- 94:         max-width: 800px;
- 95:       }
- 96:       .floorplan-vertical {
- 97:         max-width: 500px;
- 98:       }
- 99:     `,
-100:   ],
-101: })
-102: export class FloorPlanComponent implements OnChanges {
-103:   @Input() rooms: Room[] = [];
-104:   @Input() activeRoom: string = '';
-105:   @Input() floorplanImage: string = '';
-106:   @Input() orientation: 'horizontal' | 'vertical' = 'horizontal';
-107:   @Output() roomSelected = new EventEmitter<string>();
-108:   activeRoomSignal = signal('');
-109:   // Reference dimensions of the original floorplan images
-110:   referenceWidth = 800;
-111:   referenceHeight = 624;
-112:   cdr = inject(ChangeDetectorRef);
-113:   ngOnChanges(changes: SimpleChanges): void {
-114:     if (changes['orientation']) {
-115:       this.referenceWidth = this.orientation === 'horizontal' ? 800 : 550;
-116:       this.referenceHeight = this.orientation === 'horizontal' ? 624 : 800;
-117:     }
-118:     if (changes['activeRoom']) {
-119:       this.activeRoomSignal.set(this.activeRoom);
-120:     }
-121:   }
-122:   getPercentPosition(pixelValue: number, isHorizontal: boolean): number {
-123:     const reference =
-124:       this.orientation === 'horizontal'
-125:         ? isHorizontal
-126:           ? this.referenceWidth
-127:           : this.referenceHeight
-128:         : isHorizontal
-129:         ? this.referenceWidth * 1.45
-130:         : this.referenceHeight * 1.3;
-131:     return (pixelValue / reference) * 100;
-132:   }
-133:   getPercentSize(pixelValue: number, isHorizontal: boolean): number {
-134:     const reference =
-135:       this.orientation === 'horizontal'
-136:         ? isHorizontal
-137:           ? this.referenceWidth
-138:           : this.referenceHeight
-139:         : isHorizontal
-140:         ? this.referenceWidth * 1.45
-141:         : this.referenceHeight * 1.5;
-142:     return (pixelValue / reference) * 100;
-143:   }
-144:   selectRoom(roomId: string): void {
-145:     this.activeRoomSignal.set(roomId);
-146:     this.roomSelected.emit(roomId);
-147:     this.cdr.detectChanges();
-148:   }
-149: }
+ 24:       <div
+ 25:         class="mb-6 px-4 py-3 bg-light-background dark:bg-gray-700 rounded-lg text-center"
+ 26:       >
+ 27:         <p
+ 28:           class="text-sm text-light-text dark:text-gray-300 mb-0 flex items-center justify-center"
+ 29:         >
+ 30:           <ng-icon name="tablerInfoCircle" class="mr-2 text-primary"></ng-icon>
+ 31:           Click on a room to view detailed information and photos
+ 32:         </p>
+ 33:       </div>
+ 34:       <div
+ 35:         [class.floorplan-horizontal]="orientation === 'horizontal'"
+ 36:         [class.floorplan-vertical]="orientation === 'vertical'"
+ 37:         class="floorplan-container w-full relative mx-auto rounded-lg overflow-hidden"
+ 38:       >
+ 39:         <!-- Floorplan Image -->
+ 40:         <img
+ 41:           [src]="floorplanImage"
+ 42:           alt="Floorplan"
+ 43:           class="w-full border select-none border-gray-200 dark:border-gray-700 rounded-lg"
+ 44:         />
+ 45:         <!-- Clickable Room Areas with Integrated Labels -->
+ 46:         <div
+ 47:           *ngFor="let room of rooms"
+ 48:           [style.left.%]="getPercentPosition(room.coordinates.x, true)"
+ 49:           [style.top.%]="getPercentPosition(room.coordinates.y, false)"
+ 50:           [style.width.%]="getPercentSize(room.coordinates.width, true)"
+ 51:           [style.height.%]="getPercentSize(room.coordinates.height, false)"
+ 52:           [ngClass]="{
+ 53:             'bg-[#74BA43]/50': activeRoomSignal() === room.id,
+ 54:             'border-[#74BA43]': activeRoomSignal() === room.id,
+ 55:             'border-2': activeRoomSignal() === room.id,
+ 56:             'bg-[#74BA43]/10': activeRoomSignal() !== room.id,
+ 57:             'hover:bg-[#74BA43]/30': activeRoomSignal() !== room.id,
+ 58:             'hover:border-[#74BA43]': activeRoomSignal() !== room.id,
+ 59:             'border-[#74BA43]/30': activeRoomSignal() !== room.id,
+ 60:             'hover:border-2': activeRoomSignal() !== room.id
+ 61:           }"
+ 62:           class="absolute cursor-pointer hover:backdrop-blur-xs select-none group p-1 transition-all duration-200 border rounded-md flex flex-col items-start justify-start z-10"
+ 63:           (click)="selectRoom(room.id)"
+ 64:         >
+ 65:           <!-- Integrated Room Label -->
+ 66:           <div
+ 67:             class="px-2 py-1 opacity-0 group-hover:opacity-100 bg-white dark:bg-gray-800 rounded-full text-xs text-left flex-nowrap whitespace-nowrap font-medium shadow-sm select-none transition-colors duration-300 flex flex-row items-start justify-start text-dark-text dark:text-white"
+ 68:             [ngClass]="{  'opacity-100':activeRoomSignal() === room.id, }"
+ 69:           >
+ 70:             {{ room.name }}
+ 71:           </div>
+ 72:         </div>
+ 73:       </div>
+ 74:     </div>
+ 75:   `,
+ 76:   styles: [
+ 77:     `
+ 78:       .floorplan-container {
+ 79:         max-width: 800px;
+ 80:         margin: 0 auto;
+ 81:         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+ 82:           0 2px 4px -1px rgba(0, 0, 0, 0.06);
+ 83:       }
+ 84:       .floorplan-horizontal {
+ 85:         max-width: 800px;
+ 86:       }
+ 87:       .floorplan-vertical {
+ 88:         max-width: 500px;
+ 89:       }
+ 90:     `,
+ 91:   ],
+ 92: })
+ 93: export class FloorPlanComponent implements OnChanges {
+ 94:   @Input() rooms: Room[] = [];
+ 95:   @Input() activeRoom: string = '';
+ 96:   @Input() floorplanImage: string = '';
+ 97:   @Input() orientation: 'horizontal' | 'vertical' = 'horizontal';
+ 98:   @Output() roomSelected = new EventEmitter<string>();
+ 99:   activeRoomSignal = signal('');
+100:   // Reference dimensions of the original floorplan images
+101:   referenceWidth = 800;
+102:   referenceHeight = 624;
+103:   cdr = inject(ChangeDetectorRef);
+104:   ngOnChanges(changes: SimpleChanges): void {
+105:     if (changes['orientation']) {
+106:       this.referenceWidth = this.orientation === 'horizontal' ? 800 : 550;
+107:       this.referenceHeight = this.orientation === 'horizontal' ? 624 : 800;
+108:     }
+109:     if (changes['activeRoom']) {
+110:       this.activeRoomSignal.set(this.activeRoom);
+111:     }
+112:   }
+113:   getPercentPosition(pixelValue: number, isHorizontal: boolean): number {
+114:     const reference =
+115:       this.orientation === 'horizontal'
+116:         ? isHorizontal
+117:           ? this.referenceWidth
+118:           : this.referenceHeight
+119:         : isHorizontal
+120:         ? this.referenceWidth * 1.45
+121:         : this.referenceHeight * 1.3;
+122:     return (pixelValue / reference) * 100;
+123:   }
+124:   getPercentSize(pixelValue: number, isHorizontal: boolean): number {
+125:     const reference =
+126:       this.orientation === 'horizontal'
+127:         ? isHorizontal
+128:           ? this.referenceWidth
+129:           : this.referenceHeight
+130:         : isHorizontal
+131:         ? this.referenceWidth * 1.45
+132:         : this.referenceHeight * 1.5;
+133:     return (pixelValue / reference) * 100;
+134:   }
+135:   selectRoom(roomId: string): void {
+136:     this.activeRoomSignal.set(roomId);
+137:     this.roomSelected.emit(roomId);
+138:     this.cdr.detectChanges();
+139:   }
+140: }
 </file>
 
 </files>

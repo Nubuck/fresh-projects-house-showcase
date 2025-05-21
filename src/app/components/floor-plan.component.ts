@@ -22,8 +22,12 @@ import { NgIcon } from '@ng-icons/core';
       <h3 class="text-xl font-medium text-dark-text dark:text-white mb-4">
         Interactive Floorplan
       </h3>
-      <div class="mb-6 px-4 py-3 bg-light-background dark:bg-gray-700 rounded-lg text-center">
-        <p class="text-sm text-light-text dark:text-gray-300 mb-0 flex items-center justify-center">
+      <div
+        class="mb-6 px-4 py-3 bg-light-background dark:bg-gray-700 rounded-lg text-center"
+      >
+        <p
+          class="text-sm text-light-text dark:text-gray-300 mb-0 flex items-center justify-center"
+        >
           <ng-icon name="tablerInfoCircle" class="mr-2 text-primary"></ng-icon>
           Click on a room to view detailed information and photos
         </p>
@@ -37,7 +41,7 @@ import { NgIcon } from '@ng-icons/core';
         <img
           [src]="floorplanImage"
           alt="Floorplan"
-          class="w-full border border-gray-200 dark:border-gray-700 rounded-lg"
+          class="w-full border select-none border-gray-200 dark:border-gray-700 rounded-lg"
         />
         <!-- Clickable Room Areas with Integrated Labels -->
         <div
@@ -47,7 +51,7 @@ import { NgIcon } from '@ng-icons/core';
           [style.width.%]="getPercentSize(room.coordinates.width, true)"
           [style.height.%]="getPercentSize(room.coordinates.height, false)"
           [ngClass]="{
-            'bg-[#74BA43]/40': activeRoomSignal() === room.id,
+            'bg-[#74BA43]/50': activeRoomSignal() === room.id,
             'border-[#74BA43]': activeRoomSignal() === room.id,
             'border-2': activeRoomSignal() === room.id,
             'bg-[#74BA43]/10': activeRoomSignal() !== room.id,
@@ -56,7 +60,7 @@ import { NgIcon } from '@ng-icons/core';
             'border-[#74BA43]/30': activeRoomSignal() !== room.id,
             'hover:border-2': activeRoomSignal() !== room.id
           }"
-          class="absolute cursor-pointer group p-1 transition-all duration-200 border rounded-md flex flex-col items-start justify-start z-10"
+          class="absolute cursor-pointer hover:backdrop-blur-xs select-none group p-1 transition-all duration-200 border rounded-md flex flex-col items-start justify-start z-10"
           (click)="selectRoom(room.id)"
         >
           <!-- Integrated Room Label -->

@@ -7,7 +7,7 @@ import {
   inject,
   ChangeDetectorRef,
 } from '@angular/core';
-import { CommonModule, NgClass } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Room } from '../models/room.model';
 import { RoomService } from '../services/room.service';
 import { NgIcon } from '@ng-icons/core';
@@ -15,7 +15,7 @@ import { NgIcon } from '@ng-icons/core';
 @Component({
   selector: 'app-room-details',
   standalone: true,
-  imports: [CommonModule, NgClass, NgIcon],
+  imports: [CommonModule, NgIcon],
   template: `
     <!-- Loading State -->
     <div *ngIf="loading()" class="flex justify-center items-center py-16">

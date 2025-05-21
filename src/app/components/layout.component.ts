@@ -14,7 +14,7 @@ import { NgIcon } from '@ng-icons/core';
       <div
         class="container mx-auto px-4 py-3 flex justify-between items-center"
       >
-        <a routerLink="/" class="flex flex-row justify-start items-start">
+        <a routerLink="/" class="flex flex-row justify-start items-start relative">
           <svg
             width="150"
             height="42"
@@ -65,7 +65,7 @@ import { NgIcon } from '@ng-icons/core';
               </g>
             </g>
           </svg>
-          <span class="ml-2 text-xl font-medium text-dark-text dark:text-white">Spaces</span>
+          <span class="ml-2 text-lg tracking-[0.4em] font-light text-dark-text dark:text-white absolute top-5 left-10">Spaces</span>
         </a>
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center">
@@ -107,13 +107,13 @@ import { NgIcon } from '@ng-icons/core';
                 <!-- Sun icon for light mode -->
                 <ng-icon
                   name="tablerSun"
-                  class="h-4 w-4 text-yellow-500"
+                  class="h-4 w-4 text-white"
                 ></ng-icon>
 
                 <!-- Moon icon for dark mode -->
                 <ng-icon
                   name="tablerMoon"
-                  class="h-4 w-4 text-indigo-200"
+                  class="h-4 w-4 text-white"
                 ></ng-icon>
 
                 <!-- Toggle indicator -->
@@ -128,7 +128,7 @@ import { NgIcon } from '@ng-icons/core';
 
         <!-- Mobile menu button -->
         <button
-          class="md:hidden flex items-center text-dark-text dark:text-white"
+          class="md:hidden flex items-center ext-white"
           (click)="toggleMobileMenu()"
         >
           <ng-icon name="tablerMenu2" class="h-6 w-6"></ng-icon>
