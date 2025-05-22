@@ -15,7 +15,8 @@
     "tsconfig.app.json",
     "tailwind.config.js",
     "vite.config.ts",
-    "src/**/*.{ts,tsx,css,json}"
+    "src/**/*.{ts,tsx,css,json}",
+    "scripts/**/*.{js}"
 
   ],
   "ignore": {
