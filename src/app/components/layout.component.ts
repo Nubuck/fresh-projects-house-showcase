@@ -196,7 +196,7 @@ import { GenericModalComponent } from './generic-modal.component';
               Listings
             </a>
           </li>
-          <li>
+          <li class="flex flex-row justify-center">
             <button
               (click)="openContactModal(); closeMobileMenu()"
               class="primary block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0 text-left"
@@ -208,45 +208,51 @@ import { GenericModalComponent } from './generic-modal.component';
             <div class="flex items-center justify-between">
               <span class="text-light-text dark:text-gray-300">Dark Mode</span>
               <!-- Mobile Dark Mode Toggle -->
-              <button
-                class="relative inline-flex h-8 w-16 items-center rounded-[100%] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                [class]="isDarkMode() ? 'bg-primary' : 'bg-gray-300'"
-                (click)="toggleTheme()"
+               <button
+              class="relative bg-gray-300 dark:bg-gray-600' inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none "
+              (click)="toggleTheme()"
+              [attr.aria-label]="
+                isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'
+              "
+            >
+              <!-- Toggle Circle with Icon -->
+              <span
+                class="flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 items-center justify-center"
+                [class]="isDarkMode() ? 'translate-x-9' : 'translate-x-1'"
               >
-                <span
-                  class="flex h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 items-center justify-center"
-                  [class]="isDarkMode() ? 'translate-x-9' : 'translate-x-1'"
-                >
-                  <ng-icon
-                    name="tablerSun"
-                    class="h-4 w-4 text-yellow-500 transition-opacity duration-200"
-                    [class.opacity-100]="!isDarkMode()"
-                    [class.opacity-0]="isDarkMode()"
-                  ></ng-icon>
-                  <ng-icon
-                    name="tablerMoon"
-                    class="h-4 w-4 text-blue-600 absolute transition-opacity duration-200"
-                    [class.opacity-100]="isDarkMode()"
-                    [class.opacity-0]="!isDarkMode()"
-                  ></ng-icon>
-                </span>
-                <span
-                  class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-2"
-                >
-                  <ng-icon
-                    name="tablerSun"
-                    class="h-4 w-4 text-white transition-opacity duration-200"
-                    [class.opacity-100]="!isDarkMode()"
-                    [class.opacity-0]="isDarkMode()"
-                  ></ng-icon>
-                  <ng-icon
-                    name="tablerMoon"
-                    class="h-4 w-4 text-white transition-opacity duration-200"
-                    [class.opacity-100]="isDarkMode()"
-                    [class.opacity-0]="!isDarkMode()"
-                  ></ng-icon>
-                </span>
-              </button>
+                <!-- Sun Icon (visible in light mode) -->
+                <ng-icon
+                  name="tablerSun"
+                  class="h-4 w-4 text-gray-900 transition-opacity duration-200"
+                  [class.opacity-100]="!isDarkMode()"
+                  [class.opacity-0]="isDarkMode()"
+                ></ng-icon>
+                <!-- Moon Icon (visible in dark mode) -->
+                <ng-icon
+                  name="tablerMoon"
+                  class="h-4 w-4 text-gray-300  absolute transition-opacity duration-200"
+                  [class.opacity-100]="isDarkMode()"
+                  [class.opacity-0]="!isDarkMode()"
+                ></ng-icon>
+              </span>
+              <!-- Background Icons -->
+              <span
+                class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between px-2 rounded-full"
+              >
+                <ng-icon
+                  name="tablerSun"
+                  class="h-4 w-4 text-gray-900 transition-opacity duration-200"
+                  [class.opacity-100]="isDarkMode()"
+                  [class.opacity-0]="!isDarkMode()"
+                ></ng-icon>
+                <ng-icon
+                  name="tablerMoon"
+                  class="h-4 w-4 text-gray-900 transition-opacity duration-200"
+                  [class.opacity-100]="!isDarkMode()"
+                  [class.opacity-0]="isDarkMode()"
+                ></ng-icon>
+              </span>
+            </button>
             </div>
           </li>
         </ul>
@@ -271,9 +277,8 @@ import { GenericModalComponent } from './generic-modal.component';
           <div
             class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-8"
           >
-            <a
-              href="#"
-              class="text-gray-300 hover:text-white transition-colors"
+            <div
+              class="text-gray-300 hover:text-white transition-colors cursor-pointer "
               (click)="
                 openGenericModal(
                   'About Us',
@@ -281,11 +286,11 @@ import { GenericModalComponent } from './generic-modal.component';
                 )
               "
               class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
-              >About Us</a
             >
-            <a
-              href="#"
-              class="text-gray-300 hover:text-white transition-colors"
+              About Us
+            </div>
+            <div
+              class="text-gray-300 hover:text-white transition-colors cursor-pointer"
               (click)="
                 openGenericModal(
                   'Terms of Service',
@@ -295,10 +300,9 @@ import { GenericModalComponent } from './generic-modal.component';
               class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
             >
               Terms of Service
-            </a>
-            <a
-              href="#"
-              class="text-gray-300 hover:text-white transition-colors"
+            </div>
+            <div
+              class="text-gray-300 hover:text-white transition-colors cursor-pointer"
               (click)="
                 openGenericModal(
                   'Privacy Policy',
@@ -308,15 +312,14 @@ import { GenericModalComponent } from './generic-modal.component';
               class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
             >
               Privacy Policy
-            </a>
-            <a
-              href="#"
-              class="text-gray-300 hover:text-white transition-colors"
+            </div>
+            <div
+              class="text-gray-300 hover:text-white transition-colors cursor-pointer"
               (click)="openContactModal()"
               class="text-gray-300 hover:text-white transition-colors bg-transparent border-none p-0"
             >
               Contact
-            </a>
+            </div>
           </div>
         </div>
         <div

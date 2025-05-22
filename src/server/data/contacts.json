@@ -7,5 +7,37 @@
     "message": "02121321321",
     "type": "general",
     "timestamp": "2025-05-21T23:18:03.067Z"
+  },
+  {
+    "id": "mayn4tlpl3cbz1efwqe",
+    "name": "Barry Buck",
+    "email": "jozi011@gmail.com",
+    "phone": "0825726527",
+    "message": "adfadfadfs",
+    "type": "general",
+    "timestamp": "2025-05-22T00:35:39.613Z"
+  },
+  {
+    "id": "mayrz2ukq009ftx698o",
+    "name": "Barry Buck",
+    "email": "jozi011@gmail.com",
+    "phone": "0825726527",
+    "message": "adsfadfadsf",
+    "type": "agent",
+    "propertyId": "property-2",
+    "timestamp": "2025-05-22T02:51:09.740Z"
+  },
+  {
+    "id": "mayrzvrufg4amro7o46",
+    "name": "Barry Buck",
+    "email": "jozi011@gmail.com",
+    "phone": "0825726527",
+    "message": "adfadf",
+    "type": "viewing",
+    "propertyId": "property-2",
+    "preferredDate": "2025-05-28",
+    "preferredTime": "12:00",
+    "viewingType": "virtual",
+    "timestamp": "2025-05-22T02:51:47.226Z"
   }
 ]

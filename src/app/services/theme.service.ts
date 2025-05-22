@@ -6,45 +6,34 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class ThemeService {
   private platformId = inject(PLATFORM_ID);
-  private THEME_KEY = 'fresh-projects-theme';
-
-  // Use signal to track the current theme state
+  private THEME_COOKIE = 'fresh-projects-theme';
   private _darkMode = signal(false);
-
-  // Track if we're using system preference or user choice
   private _useSystemPreference = signal(true);
 
   constructor() {
     this.initialize();
-
-    // Set up an effect to handle theme changes
     effect(() => {
       this.applyTheme(this._darkMode());
     });
   }
 
-  // Publicly expose the theme state
   get darkMode() {
     return this._darkMode();
   }
 
-  // Initialize the theme based on stored preference or system preference
   private initialize(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Check for stored theme preference
-      const storedTheme = localStorage.getItem(this.THEME_KEY);
+      const storedTheme = this.getCookie(this.THEME_COOKIE);
 
       if (storedTheme) {
-        // User has a stored preference, use it
         this._useSystemPreference.set(false);
         this._darkMode.set(storedTheme === 'dark');
       } else {
-        // Use system preference
         this._useSystemPreference.set(true);
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         this._darkMode.set(prefersDark);
 
-        // Set up listener for system preference changes
+        // Listen for system theme changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
           if (this._useSystemPreference()) {
             this._darkMode.set(e.matches);
@@ -52,36 +41,89 @@ export class ThemeService {
         });
       }
 
-      // Immediately apply the theme at startup
+      this.applyTheme(this._darkMode());
+    } else {
+      // Server-side: try to get theme from cookie for SSR
+      const serverTheme = this.getServerCookie();
+      if (serverTheme) {
+        this._darkMode.set(serverTheme === 'dark');
+        this._useSystemPreference.set(false);
+      }
       this.applyTheme(this._darkMode());
     }
   }
 
-  // Toggle between light and dark themes
   toggleTheme(): void {
-    // When user toggles, we no longer use system preference
     this._useSystemPreference.set(false);
     this._darkMode.update(current => !current);
-
-    // Effect will handle applying the theme
   }
 
-  // Apply the theme to the document
   private applyTheme(isDark: boolean): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Save preference to localStorage if not using system preference
+      // Save to cookie only if not using system preference
       if (!this._useSystemPreference()) {
-        localStorage.setItem(this.THEME_KEY, isDark ? 'dark' : 'light');
+        this.setCookie(this.THEME_COOKIE, isDark ? 'dark' : 'light', 365);
+      } else {
+        // Remove cookie if using system preference
+        this.deleteCookie(this.THEME_COOKIE);
       }
 
-      // Apply class to document element (html tag)
+      // Apply theme to document
+      const htmlElement = document.documentElement;
       if (isDark) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.colorScheme = 'dark';
+        htmlElement.classList.add('dark');
+        htmlElement.style.colorScheme = 'dark';
       } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.colorScheme = 'light';
+        htmlElement.classList.remove('dark');
+        htmlElement.style.colorScheme = 'light';
+      }
+    } else {
+      // Server-side rendering
+      // This will be applied during SSR if cookie is available
+      if (typeof document !== 'undefined') {
+        const htmlElement = document.documentElement;
+        if (isDark) {
+          htmlElement.classList.add('dark');
+          htmlElement.style.colorScheme = 'dark';
+        } else {
+          htmlElement.classList.remove('dark');
+          htmlElement.style.colorScheme = 'light';
+        }
       }
     }
+  }
+
+  private setCookie(name: string, value: string, days: number): void {
+    if (isPlatformBrowser(this.platformId)) {
+      const expires = new Date();
+      expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+    }
+  }
+
+  private getCookie(name: string): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+      }
+    }
+    return null;
+  }
+
+  private deleteCookie(name: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+    }
+  }
+
+  private getServerCookie(): string | null {
+    // For SSR, you might need to inject the request and read cookies
+    // This is a placeholder for server-side cookie reading
+    // You would typically inject the request context or use a cookie service
+    return null;
   }
 }

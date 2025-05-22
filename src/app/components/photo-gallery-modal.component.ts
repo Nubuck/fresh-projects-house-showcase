@@ -1,4 +1,3 @@
-// src/app/components/photo-gallery-modal.component.ts
 import { Component, Input, Output, EventEmitter, signal, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
@@ -16,7 +15,7 @@ interface PhotoItem {
     <!-- Full Screen Modal -->
     <div
       *ngIf="isOpen"
-      class="fixed top-0 left-0 right-0 bottom-0 z-[60] bg-black bg-opacity-95 flex items-center justify-center"
+      class="fixed top-0 left-0 right-0 bottom-0 z-[60] bg-black/75 backdrop-blur-lg flex items-center justify-center overflow-hidden scrollbar-hide"
       [attr.aria-modal]="true"
       role="dialog"
       (click)="closeModal()"
@@ -93,7 +92,7 @@ interface PhotoItem {
         (click)="$event.stopPropagation()"
       >
         <div
-          class="overflow-auto max-w-full max-h-full"
+          class="overflow-auto max-w-full max-h-full scrollbar-hide"
           #photoContainer
           (wheel)="onWheel($event)"
           (mousedown)="startDrag($event)"
@@ -155,7 +154,6 @@ export class PhotoGalleryModalComponent implements OnInit {
 
   ngOnInit() {
     this.currentPhotoIndex.set(this.initialIndex);
-
     if (isPlatformBrowser(this.platformId)) {
       document.addEventListener('keydown', this.handleKeyPress);
     }
@@ -239,7 +237,6 @@ export class PhotoGalleryModalComponent implements OnInit {
   zoomOut() {
     if (this.zoomLevel() > 1) {
       this.zoomLevel.update(level => Math.max(1, level - 0.25));
-      // Reset pan if zoomed out to fit
       if (this.zoomLevel() === 1) {
         this.panX.set(0);
         this.panY.set(0);
@@ -287,6 +284,6 @@ export class PhotoGalleryModalComponent implements OnInit {
   }
 
   onImageLoad() {
-    // Image loaded, can perform any necessary calculations
+    // Image loaded
   }
 }

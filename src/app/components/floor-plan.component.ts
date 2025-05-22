@@ -25,12 +25,13 @@ import { NgIcon } from '@ng-icons/core';
       <div
         class="mb-6 px-4 py-3 bg-light-background dark:bg-gray-700 rounded-lg text-center"
       >
-        <p
-          class="text-sm text-light-text dark:text-gray-300 mb-0 flex items-center justify-center"
+        <div
+          class="text-sm text-light-text dark:text-gray-300 mb-0 flex flex-row items-center justify-center"
         >
-          <ng-icon name="tablerInfoCircle" class="mr-2 text-primary"></ng-icon>
-          Click on a room to view detailed information and photos
-        </p>
+          <span class=" w-8 h-8"><ng-icon name="tablerInfoCircle" class="text-primary text-2xl"></ng-icon></span>
+          <span class="text-base font-medium text-left pl-2">Click on a room to view detailed information and photos
+        </span>
+        </div>
       </div>
       <div
         [class.floorplan-horizontal]="orientation === 'horizontal'"

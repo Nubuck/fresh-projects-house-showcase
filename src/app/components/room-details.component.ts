@@ -1,4 +1,3 @@
-// src/app/components/room-details.component.ts - Enhanced version
 import {
   Component,
   Input,
@@ -80,16 +79,23 @@ interface PhotoData {
               (load)="onHighResImageLoaded(photo)"
               loading="lazy"
             />
-
             <!-- Hover overlay with zoom icon -->
-            <div class="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-200 flex items-center justify-center">
-              <div class="transform scale-0 group-hover:scale-100 transition-transform duration-200 bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 rounded-full p-3">
-                <ng-icon name="tablerEye" class="h-6 w-6 text-primary"></ng-icon>
+            <div
+              class="absolute top-0 left-0 right-0 bottom-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center"
+            >
+              <div
+                class="transform scale-0 group-hover:scale-100 transition-transform duration-200 bg-white/90 dark:bg-gray-800/90 rounded-full w-8 h-8 flex flex-col items-center justify-center "
+              >
+                <ng-icon
+                  name="tablerEye"
+                  class="h-6 w-6 text-primary text-2xl"
+                ></ng-icon>
               </div>
             </div>
-
             <!-- Photo number indicator -->
-            <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+            <div
+              class="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
+            >
               {{ i + 1 }} / {{ roomPhotos().length }}
             </div>
           </div>
@@ -156,7 +162,7 @@ export class RoomDetailsComponent implements OnChanges {
   roomPhotos = signal<PhotoData[]>([]);
   galleryOpen = signal<boolean>(false);
   selectedPhotoIndex = signal<number>(0);
-  galleryPhotos = signal<{src: string; alt: string}[]>([]);
+  galleryPhotos = signal<{ src: string; alt: string }[]>([]);
 
   private roomService = inject(RoomService);
   private cdr = inject(ChangeDetectorRef);
@@ -172,8 +178,6 @@ export class RoomDetailsComponent implements OnChanges {
     this.roomService.getRoom(id).subscribe({
       next: (roomData) => {
         this.room.set(roomData);
-
-        // Process photos for progressive loading
         const photos = roomData.photos.map((photo) => ({
           highRes: photo,
           lowRes: this.getLowResVersion(photo),
@@ -181,13 +185,11 @@ export class RoomDetailsComponent implements OnChanges {
         }));
         this.roomPhotos.set(photos);
 
-        // Prepare gallery photos
         const galleryPhotos = roomData.photos.map((photo, index) => ({
           src: photo,
-          alt: `${roomData.name} photo ${index + 1}`
+          alt: `${roomData.name} photo ${index + 1}`,
         }));
         this.galleryPhotos.set(galleryPhotos);
-
         this.loading.set(false);
         this.cdr.detectChanges();
       },
@@ -200,8 +202,6 @@ export class RoomDetailsComponent implements OnChanges {
   }
 
   private getLowResVersion(highResPath: string): string {
-    // In a real implementation, you might have actual low-res versions
-    // For now, we'll use the same image but could implement thumbnail generation
     return highResPath;
   }
 

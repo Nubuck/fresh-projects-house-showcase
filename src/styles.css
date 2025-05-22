@@ -11,6 +11,7 @@
   --color-light-text: #3E547C;
   --font-family-0: 'Raleway', sans-serif;
   --font-family-1: 'Inter', sans-serif;
+
   font-family: var(--font-family-1), Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
@@ -24,15 +25,12 @@
   -webkit-text-size-adjust: 100%;
 }
 
-/* This is the crucial part - explicitly prevent media query dark mode */
 @media (prefers-color-scheme: dark) {
   :root:not(.dark) {
-    /* Override system dark mode preference when .dark is not present */
     color-scheme: light;
   }
 }
 
-/* Dark mode styles - apply ONLY when .dark class is present */
 .dark {
   --color-light-background: #2e3440;
   --color-dark-text: #e5e9f0;
@@ -48,6 +46,7 @@ body {
   min-height: 100vh;
 }
 
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family-1);
   color: var(--color-dark-text);
@@ -74,6 +73,7 @@ p {
   line-height: 1.6;
 }
 
+/* Links */
 a.primary {
   font-weight: 500;
   color: var(--color-primary);
@@ -84,7 +84,8 @@ a:hover {
   opacity: 0.9;
 }
 
-button {
+/* Base button styles - only apply to buttons without tailwind classes */
+button:not([class*="bg-"]):not([class*="border-"]):not([class*="text-"]) {
   font-size: 1em;
   font-weight: 500;
   font-family: var(--font-family-1);
@@ -92,7 +93,7 @@ button {
   transition: opacity 0.25s;
 }
 
-button:hover {
+button:not([class*="bg-"]):not([class*="border-"]):not([class*="text-"]):hover {
   opacity: 0.9;
 }
 
@@ -101,6 +102,7 @@ button:focus-visible {
   outline: 0;
 }
 
+/* Primary button class - can be used with .primary class */
 button.primary {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -123,6 +125,7 @@ button.primary:focus-visible {
   outline: 4px auto var(--color-primary);
 }
 
+/* Utility classes for custom properties */
 .bg-primary {
   background-color: var(--color-primary);
 }
@@ -167,12 +170,24 @@ button.primary:focus-visible {
   background-color: var(--color-light-background);
 }
 
-/* Override for light mode */
+/* Light theme overrides - explicit light theme styles */
 :root:not(.dark) .bg-white {
   background-color: #ffffff !important;
 }
 
-/* Dark mode specific overrides with .dark class checks */
+:root:not(.dark) .text-dark-text {
+  color: var(--color-dark-text) !important;
+}
+
+:root:not(.dark) .text-light-text {
+  color: var(--color-light-text) !important;
+}
+
+:root:not(.dark) .bg-light-background {
+  background-color: var(--color-light-background) !important;
+}
+
+/* Dark theme styles */
 .dark .bg-white {
   background-color: #2e3440;
 }
@@ -195,4 +210,14 @@ button.primary:focus-visible {
 
 .dark .border-gray-200 {
   border-color: #4c566a;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* for Internet Explorer, Edge */
+  scrollbar-width: none;  /* for Firefox */
+  overflow-y: auto;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* for Chrome, Safari, and Opera */
 }

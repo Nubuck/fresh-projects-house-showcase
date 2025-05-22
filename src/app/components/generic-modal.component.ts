@@ -7,10 +7,10 @@ import { NgIcon } from '@ng-icons/core';
 @Component({
   selector: 'app-generic-modal',
   standalone: true,
-  imports: [CommonModule, BaseModalComponent, NgIcon],
+  imports: [CommonModule, BaseModalComponent],
   template: `
-    <app-base-modal 
-      [isOpen]="isOpen" 
+    <app-base-modal
+      [isOpen]="isOpen"
       [title]="title"
       (closed)="closeModal()"
     >
@@ -18,7 +18,7 @@ import { NgIcon } from '@ng-icons/core';
         <div class="text-light-text dark:text-gray-300 leading-relaxed">
           {{ content }}
         </div>
-        
+
         <!-- Additional content based on modal type -->
         <div *ngIf="title === 'About Us'" class="mt-6 space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -32,11 +32,11 @@ import { NgIcon } from '@ng-icons/core';
             </div>
           </div>
         </div>
-        
+
         <div *ngIf="title === 'Terms of Service'" class="mt-6 space-y-4 text-sm">
           <div class="space-y-3">
             <h4 class="font-medium text-dark-text dark:text-white">Key Terms:</h4>
-            <ul class="list-disc list-inside space-y-2 text-light-text dark:text-gray-300">
+            <ul class="list-disc list-inside space-y-2 text-light-text dark:text-gray-300 text-left">
               <li>All property information is provided by third-party agents and sellers</li>
               <li>Virtual tours and photos are for informational purposes only</li>
               <li>Property availability and pricing subject to change without notice</li>
@@ -45,18 +45,18 @@ import { NgIcon } from '@ng-icons/core';
             </ul>
           </div>
         </div>
-        
+
         <div *ngIf="title === 'Privacy Policy'" class="mt-6 space-y-4 text-sm">
           <div class="space-y-3">
             <h4 class="font-medium text-dark-text dark:text-white">Data We Collect:</h4>
-            <ul class="list-disc list-inside space-y-2 text-light-text dark:text-gray-300">
+            <ul class="list-disc list-inside space-y-2 text-light-text dark:text-gray-300 text-left">
               <li>Contact information (name, email, phone) when you submit forms</li>
               <li>Property preferences and search history</li>
               <li>Device information and usage analytics</li>
               <li>Cookies for improved user experience</li>
             </ul>
             <h4 class="font-medium text-dark-text dark:text-white mt-4">How We Use Your Data:</h4>
-            <ul class="list-disc list-inside space-y-2 text-light-text dark:text-gray-300">
+            <ul class="list-disc list-inside space-y-2 text-light-text dark:text-gray-300 text-left">
               <li>To facilitate property viewings and agent communications</li>
               <li>To improve our platform and services</li>
               <li>To send relevant property updates (with consent)</li>
@@ -65,7 +65,7 @@ import { NgIcon } from '@ng-icons/core';
           </div>
         </div>
       </div>
-      
+
       <!-- Modal Actions -->
       <div class="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button

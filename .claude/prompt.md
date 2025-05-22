@@ -162,3 +162,21 @@ In this chat I will lay out what I believe will elevate the current project over
 - the photos displayed in the src/app/components/room-details.component.ts file, should be lazy loaded for high res but load the low res when server rendered - adding a zoomable modal gallery view when clicking an image would be a great touch
 
 Please ask any clarifying questions you may have and then proceed with the above.
+
+
+---
+
+We've just added contact, schedule and gallery modals in the components below:
+
+- src/app/components/base-modal.component.ts
+- src/app/components/contact-modal.component.ts
+- src/app/components/floor-plan.component.ts
+- src/app/components/generic-modal.component.ts
+- src/app/components/schedule-viewing-modal.component.ts
+- src/app/components/room-details.component.ts
+
+- When we wrote this I forgot to remind you that we are using tailwind v4 and all bg-opacity classes need to be changed to bg-color/50 for example
+- I have also updated the styles.css button styles to include a .primary class the the button class was overriding any customized icon buttons etc. We need to be mindful of broadly scoped css classes when using tailwind as they easily can override tailwind utils
+- Still having an issue applying light theme classes as dark: classes seem to still override the light styles with system preference
+- I see we're using local storage to cache the active theme selection - can we use a cookie and have the correct theme class rendered from the server - the light them server renders by default and then flashes to dark theme if that is the cached theme.
+- How can I exclude /server/data/contacts.json from being watching during development, when ever I save a contact form the contacts.json file is updated and the dev server restarts

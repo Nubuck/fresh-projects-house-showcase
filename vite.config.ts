@@ -15,6 +15,15 @@ export default defineConfig(({ mode }) => ({
     analog(),
     tailwindcss(),
   ],
+  server: {
+    watch: {
+      ignored: [
+        '**/src/server/data/contacts.json',
+        '**/node_modules/**',
+        '**/dist/**'
+      ]
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',
