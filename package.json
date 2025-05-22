@@ -11,6 +11,8 @@
     "ng": "ng",
     "dev": "ng serve",
     "build": "ng build",
+    "build:ssr": "ng build --configuration production",
+    "serve:ssr": "node dist/server/main.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

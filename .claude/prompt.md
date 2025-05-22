@@ -180,3 +180,9 @@ We've just added contact, schedule and gallery modals in the components below:
 - Still having an issue applying light theme classes as dark: classes seem to still override the light styles with system preference
 - I see we're using local storage to cache the active theme selection - can we use a cookie and have the correct theme class rendered from the server - the light them server renders by default and then flashes to dark theme if that is the cached theme.
 - How can I exclude /server/data/contacts.json from being watching during development, when ever I save a contact form the contacts.json file is updated and the dev server restarts
+
+---
+
+Well Done, we're finally ready to deploy, write our docs and submit.
+
+I have a fly.io account, please help me create a fly.io cheap machine that is capable of running the analog server for server side rendering and then deplay it - we will call this app fresh-spaces - repomix file updated with all code and config files now

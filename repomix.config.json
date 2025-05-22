@@ -15,9 +15,9 @@
     "tsconfig.app.json",
     "tailwind.config.js",
     "vite.config.ts",
+    "index.html",
     "src/**/*.{ts,tsx,css,json}",
-    "scripts/**/*.{js}"
-
+    "scripts/image-processor.js"
   ],
   "ignore": {
     "useGitignore": true,
