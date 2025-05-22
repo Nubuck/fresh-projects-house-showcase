@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // Configuration for image processing
 const config = {
   // Base directory for source and output
-  baseDir: path.resolve(__dirname, '../images'), // Assuming './images' is at project root
+  baseDir: path.resolve(__dirname, '../image-optimization'), // Assuming './image-optimization' is at project root
 
   // Source directories containing property images
   sourceDirs: ['property-1', 'property-2'],

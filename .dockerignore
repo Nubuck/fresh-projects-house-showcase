@@ -7,11 +7,12 @@ dist
 .angular
 .claude
 .nx
-images
+image-optimization
 scripts
 .editorconfig
 repomix.xml
 repomix.config.json
+README.md
 
 # Environment files
 .env*
