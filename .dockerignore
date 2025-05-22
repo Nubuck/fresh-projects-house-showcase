@@ -5,6 +5,13 @@ npm-debug.log*
 # Production build
 dist
 .angular
+.claude
+.nx
+images
+scripts
+.editorconfig
+repomix.xml
+repomix.config.json
 
 # Environment files
 .env*
