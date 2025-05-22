@@ -13,7 +13,7 @@
     "dev": "ng serve",
     "build:dev": "ng build",
     "build": "ng build --configuration production",
-    "serve:ssr": "node dist/server/main.js",
+    "serve:ssr": "node dist/analog/server/index.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

@@ -1,20 +1,24 @@
-# Use the official Node.js 18 image as base
+# Use the official Node.js 20 LTS image as base
 FROM node:20-alpine AS base
 
-# Install dependencies only when needed
+# Install production dependencies
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-
-# Copy package files
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci --only=production && npm cache clean --force
 
-# Rebuild the source code only when needed
+# Install all dependencies (including dev dependencies for building)
+FROM base AS builder-deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci && npm cache clean --force
+
+# Build the application
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder-deps /app/node_modules ./node_modules
 COPY . .
 
 # Build the application

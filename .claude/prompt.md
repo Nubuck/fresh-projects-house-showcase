@@ -186,3 +186,83 @@ We've just added contact, schedule and gallery modals in the components below:
 Well Done, we're finally ready to deploy, write our docs and submit.
 
 I have a fly.io account, please help me create a fly.io cheap machine that is capable of running the analog server for server side rendering and then deplay it - we will call this app fresh-spaces - repomix file updated with all code and config files now
+
+
+---
+
+
+I got an error deploying - logs below I think we're omitting the dev dependencies needed to build the project, can you help me fix the dockerfile to include them?
+
+==> Building image with Depot   
+--> build:  (​)
+[+] Building 20.9s (15/19)
+ => [internal] load build definition from Dockerfile                                                                                                                                                                      0.0s 
+ => => transferring dockerfile: 1.34kB                                                                                                                                                                                    0.0s 
+ => [internal] load metadata for docker.io/library/node:20-alpine                                                                                                                                                         3.5s 
+ => [internal] load .dockerignore                                                                                                                                                                                         0.0s 
+ => => transferring context: 474B                                                                                                                                                                                         0.0s 
+ => [internal] load build context                                                                                                                                                                                         1.1s 
+ => => transferring context: 6.88MB                                                                                                                                                                                       1.1s 
+ => [base 1/1] FROM docker.io/library/node:20-alpine@sha256:be56e91681a8ec1bba91e3006039bd228dc797fd984794a3efedab325b36e679                                                                                              1.8s 
+ => => resolve docker.io/library/node:20-alpine@sha256:be56e91681a8ec1bba91e3006039bd228dc797fd984794a3efedab325b36e679                                                                                                   0.0s 
+ => => sha256:699b753813e6a832b1187221e7d65c4f04fab95c6dbf8dc51a77376d361e78b5 448B / 448B                                                                                                                                0.3s 
+ => => sha256:301aebe3d905aca56c1cf878358dbf736546a412ef64c2192098ff0cf4ec0144 1.26MB / 1.26MB                                                                                                                            0.3s 
+ => => sha256:05c1247b2bae42e663142a67e8e67e0721f7e5626cae79d0e7c51cf0cb9ddbc2 42.95MB / 42.95MB                                                                                                                          0.5s 
+ => => extracting sha256:05c1247b2bae42e663142a67e8e67e0721f7e5626cae79d0e7c51cf0cb9ddbc2                                                                                                                                 1.2s 
+ => => extracting sha256:301aebe3d905aca56c1cf878358dbf736546a412ef64c2192098ff0cf4ec0144                                                                                                                                 0.0s 
+ => => extracting sha256:699b753813e6a832b1187221e7d65c4f04fab95c6dbf8dc51a77376d361e78b5                                                                                                                                 0.0s 
+ => [runner 1/7] WORKDIR /app                                                                                                                                                                                             1.7s 
+ => [deps 1/4] RUN apk add --no-cache libc6-compat                                                                                                                                                                        2.9s 
+ => [runner 2/7] RUN addgroup --system --gid 1001 nodejs                                                                                                                                                                  0.2s 
+ => [runner 3/7] RUN adduser --system --uid 1001 analog                                                                                                                                                                   0.1s 
+ => [deps 2/4] WORKDIR /app                                                                                                                                                                                               0.0s 
+ => [deps 3/4] COPY package.json package-lock.json* ./                                                                                                                                                                    0.0s 
+ => [deps 4/4] RUN npm ci --only=production                                                                                                                                                                               7.6s 
+ => [builder 2/4] COPY --from=deps /app/node_modules ./node_modules                                                                                                                                                       2.9s 
+ => [builder 3/4] COPY . .                                                                                                                                                                                                0.1s 
+ => ERROR [builder 4/4] RUN npm run build                                                                                                                                                                                 0.5s 
+------
+ > [builder 4/4] RUN npm run build:
+0.470
+0.470 > house-showcase@0.0.0 build
+0.470 > ng build --configuration production
+0.470
+0.480 sh: ng: not found
+------
+==> Building image
+Waiting for depot builder...
+Waiting for depot builder...
+Waiting for depot builder...
+Waiting for depot builder...
+Waiting for depot builder...
+==> Building image with Depot   
+--> build:  (​)
+[+] Building 1.7s (14/19)
+ => [internal] load build definition from Dockerfile                                                                                                                                                                      0.0s 
+ => => transferring dockerfile: 1.34kB                                                                                                                                                                                    0.0s 
+ => [internal] load metadata for docker.io/library/node:20-alpine                                                                                                                                                         1.1s 
+ => [internal] load .dockerignore                                                                                                                                                                                         0.0s 
+ => => transferring context: 474B                                                                                                                                                                                         0.0s 
+ => [internal] load build context                                                                                                                                                                                         0.6s 
+ => => transferring context: 7.47kB                                                                                                                                                                                       0.0s 
+ => [base 1/1] FROM docker.io/library/node:20-alpine@sha256:be56e91681a8ec1bba91e3006039bd228dc797fd984794a3efedab325b36e679                                                                                              0.0s 
+ => => resolve docker.io/library/node:20-alpine@sha256:be56e91681a8ec1bba91e3006039bd228dc797fd984794a3efedab325b36e679                                                                                                   0.0s 
+ => CACHED [builder 1/4] WORKDIR /app                                                                                                                                                                                     0.0s 
+ => CACHED [runner 2/7] RUN addgroup --system --gid 1001 nodejs                                                                                                                                                           0.0s 
+ => CACHED [runner 3/7] RUN adduser --system --uid 1001 analog                                                                                                                                                            0.0s 
+ => CACHED [deps 1/4] RUN apk add --no-cache libc6-compat                                                                                                                                                                 0.0s 
+ => CACHED [deps 2/4] WORKDIR /app                                                                                                                                                                                        0.0s 
+ => CACHED [deps 3/4] COPY package.json package-lock.json* ./                                                                                                                                                             0.0s 
+ => CACHED [deps 4/4] RUN npm ci --only=production                                                                                                                                                                        0.0s 
+ => CACHED [builder 2/4] COPY --from=deps /app/node_modules ./node_modules                                                                                                                                                0.0s 
+ => CACHED [builder 3/4] COPY . .                                                                                                                                                                                         0.0s 
+ => ERROR [builder 4/4] RUN npm run build                                                                                                                                                                                 0.5s 
+------
+ > [builder 4/4] RUN npm run build:
+0.474
+0.474 > house-showcase@0.0.0 build
+0.474 > ng build --configuration production
+0.474
+0.479 sh: ng: not found
+------
+Error: failed to fetch an image or build from source: error building: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 127
