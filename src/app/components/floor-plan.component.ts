@@ -54,6 +54,7 @@ import { NgIcon } from '@ng-icons/core';
             'bg-[#74BA43]/50': activeRoomSignal() === room.id,
             'border-[#74BA43]': activeRoomSignal() === room.id,
             'border-2': activeRoomSignal() === room.id,
+            'shadow-lg': activeRoomSignal() === room.id,
             'bg-[#74BA43]/10': activeRoomSignal() !== room.id,
             'hover:bg-[#74BA43]/30': activeRoomSignal() !== room.id,
             'hover:border-[#74BA43]': activeRoomSignal() !== room.id,

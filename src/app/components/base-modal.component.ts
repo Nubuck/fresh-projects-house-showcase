@@ -1,5 +1,14 @@
 // src/app/components/base-modal.component.ts
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+  inject,
+  PLATFORM_ID,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
 
@@ -18,7 +27,7 @@ import { NgIcon } from '@ng-icons/core';
     >
       <!-- Backdrop -->
       <div
-        class="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+        class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
         (click)="closeModal()"
       ></div>
 
@@ -31,17 +40,19 @@ import { NgIcon } from '@ng-icons/core';
           (click)="$event.stopPropagation()"
         >
           <!-- Modal Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
+          >
             <h3 class="text-lg font-medium text-dark-text dark:text-white">
               {{ title }}
             </h3>
             <button
               type="button"
-              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              class="h-8 w-8 flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors duration-200"
               (click)="closeModal()"
               [attr.aria-label]="'Close ' + title"
             >
-              <ng-icon name="tablerX" class="h-5 w-5"></ng-icon>
+              <ng-icon name="tablerX" class="h-6 w-6"></ng-icon>
             </button>
           </div>
 
@@ -52,7 +63,7 @@ import { NgIcon } from '@ng-icons/core';
         </div>
       </div>
     </div>
-  `
+  `,
 })
 export class BaseModalComponent implements OnInit, OnDestroy {
   @Input() isOpen: boolean = false;

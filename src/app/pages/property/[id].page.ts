@@ -91,14 +91,14 @@ import { NgIcon } from '@ng-icons/core';
           <p class="text-light-text dark:text-gray-300 max-w-2xl mx-auto mb-6">Schedule a viewing or get more information about this property by contacting our agents.</p>
           <div class="flex flex-col sm:flex-row justify-center gap-4">
             <button
-              class="text-white px-6 py-3 rounded-lg flex items-center justify-center transition-opacity bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary"
+              class="primary text-white px-6 py-3 rounded-lg flex items-center justify-center transition-opacity bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary"
               (click)="openContactAgentModal()"
             >
               <ng-icon name="tablerPhone" class="mr-2 text-2xl"></ng-icon>
               Contact Agent
             </button>
             <button
-              class="border border-primary text-primary dark:text-primary px-6 py-3 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-colors"
+              class="primary border border-primary text-white dark:text-primary px-6 py-3 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-colors"
               (click)="openScheduleViewingModal()"
             >
               <ng-icon name="tablerCalendarEvent" class="mr-2 text-2xl"></ng-icon>

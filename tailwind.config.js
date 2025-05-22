@@ -42,6 +42,7 @@ module.exports = {
   // Add a safelist for critical classes to ensure they're always generated
   safelist: [
     'bg-white',
+    'bg-gray-100',
     'dark:bg-gray-900',
     'dark:bg-gray-800',
     'dark:bg-gray-700',

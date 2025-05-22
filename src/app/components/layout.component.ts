@@ -107,7 +107,7 @@ import { GenericModalComponent } from './generic-modal.component';
             <li>
               <button
                 (click)="openContactModal()"
-                class="text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0"
+                class="primary text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0"
               >
                 Contact
               </button>
@@ -116,10 +116,7 @@ import { GenericModalComponent } from './generic-modal.component';
           <!-- Improved Dark mode toggle -->
           <div class="ml-8 flex items-center">
             <button
-              class="relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-              [class]="
-                isDarkMode() ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
-              "
+              class="relative bg-gray-300 dark:bg-gray-600' inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none "
               (click)="toggleTheme()"
               [attr.aria-label]="
                 isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'
@@ -133,14 +130,14 @@ import { GenericModalComponent } from './generic-modal.component';
                 <!-- Sun Icon (visible in light mode) -->
                 <ng-icon
                   name="tablerSun"
-                  class="h-4 w-4 text-yellow-500 transition-opacity duration-200"
+                  class="h-4 w-4 text-gray-900 transition-opacity duration-200"
                   [class.opacity-100]="!isDarkMode()"
                   [class.opacity-0]="isDarkMode()"
                 ></ng-icon>
                 <!-- Moon Icon (visible in dark mode) -->
                 <ng-icon
                   name="tablerMoon"
-                  class="h-4 w-4 text-blue-600 absolute transition-opacity duration-200"
+                  class="h-4 w-4 text-gray-300  absolute transition-opacity duration-200"
                   [class.opacity-100]="isDarkMode()"
                   [class.opacity-0]="!isDarkMode()"
                 ></ng-icon>
@@ -151,15 +148,15 @@ import { GenericModalComponent } from './generic-modal.component';
               >
                 <ng-icon
                   name="tablerSun"
-                  class="h-4 w-4 text-white transition-opacity duration-200"
-                  [class.opacity-100]="!isDarkMode()"
-                  [class.opacity-0]="isDarkMode()"
+                  class="h-4 w-4 text-gray-900 transition-opacity duration-200"
+                  [class.opacity-100]="isDarkMode()"
+                  [class.opacity-0]="!isDarkMode()"
                 ></ng-icon>
                 <ng-icon
                   name="tablerMoon"
-                  class="h-4 w-4 text-white transition-opacity duration-200"
-                  [class.opacity-100]="isDarkMode()"
-                  [class.opacity-0]="!isDarkMode()"
+                  class="h-4 w-4 text-gray-900 transition-opacity duration-200"
+                  [class.opacity-100]="!isDarkMode()"
+                  [class.opacity-0]="isDarkMode()"
                 ></ng-icon>
               </span>
             </button>
@@ -167,7 +164,7 @@ import { GenericModalComponent } from './generic-modal.component';
         </nav>
         <!-- Mobile menu button -->
         <button
-          class="md:hidden flex items-center text-dark-text dark:text-white bg-transparent border-none p-2"
+          class="primary md:hidden flex items-center text-dark-text dark:text-white bg-transparent border-none p-2"
           (click)="toggleMobileMenu()"
         >
           <ng-icon name="tablerMenu2" class="h-6 w-6"></ng-icon>
@@ -202,7 +199,7 @@ import { GenericModalComponent } from './generic-modal.component';
           <li>
             <button
               (click)="openContactModal(); closeMobileMenu()"
-              class="block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0 text-left"
+              class="primary block text-light-text dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 bg-transparent border-none p-0 text-left"
             >
               Contact
             </button>
@@ -212,7 +209,7 @@ import { GenericModalComponent } from './generic-modal.component';
               <span class="text-light-text dark:text-gray-300">Dark Mode</span>
               <!-- Mobile Dark Mode Toggle -->
               <button
-                class="relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                class="relative inline-flex h-8 w-16 items-center rounded-[100%] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
                 [class]="isDarkMode() ? 'bg-primary' : 'bg-gray-300'"
                 (click)="toggleTheme()"
               >

@@ -12,8 +12,8 @@ import { NgIcon } from '@ng-icons/core';
   standalone: true,
   imports: [CommonModule, FormsModule, BaseModalComponent, NgIcon],
   template: `
-    <app-base-modal 
-      [isOpen]="isOpen" 
+    <app-base-modal
+      [isOpen]="isOpen"
       [title]="modalTitle"
       (closed)="closeModal()"
     >
@@ -21,7 +21,7 @@ import { NgIcon } from '@ng-icons/core';
       <div *ngIf="loading()" class="flex justify-center items-center py-8">
         <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
       </div>
-      
+
       <!-- Success State -->
       <div *ngIf="submitted()" class="text-center py-8">
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 mb-4">
@@ -39,12 +39,12 @@ import { NgIcon } from '@ng-icons/core';
           Close
         </button>
       </div>
-      
+
       <!-- Form State -->
       <form *ngIf="!loading() && !submitted()" #contactForm="ngForm" (ngSubmit)="onSubmit(contactForm)">
         <div class="space-y-4">
           <!-- Name Field -->
-          <div>
+          <div class="flex flex-col items-start justify-start">
             <label for="name" class="block text-sm font-medium text-dark-text dark:text-white mb-1">
               Full Name *
             </label>
@@ -55,16 +55,16 @@ import { NgIcon } from '@ng-icons/core';
               [(ngModel)]="formData.name"
               required
               #name="ngModel"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary bg-light-background dark:bg-gray-800 text-dark-text dark:text-white"
               placeholder="Enter your full name"
             >
             <div *ngIf="name.invalid && name.touched" class="text-red-500 text-sm mt-1">
               Name is required
             </div>
           </div>
-          
+
           <!-- Email Field -->
-          <div>
+          <div class="flex flex-col items-start justify-start">
             <label for="email" class="block text-sm font-medium text-dark-text dark:text-white mb-1">
               Email Address *
             </label>
@@ -76,7 +76,7 @@ import { NgIcon } from '@ng-icons/core';
               required
               email
               #email="ngModel"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary bg-light-background dark:bg-gray-800 text-dark-text dark:text-white"
               placeholder="Enter your email address"
             >
             <div *ngIf="email.invalid && email.touched" class="text-red-500 text-sm mt-1">
@@ -84,9 +84,9 @@ import { NgIcon } from '@ng-icons/core';
               <span *ngIf="email.errors?.['email']">Please enter a valid email address</span>
             </div>
           </div>
-          
+
           <!-- Phone Field -->
-          <div>
+          <div class="flex flex-col items-start justify-start">
             <label for="phone" class="block text-sm font-medium text-dark-text dark:text-white mb-1">
               Phone Number
             </label>
@@ -96,13 +96,13 @@ import { NgIcon } from '@ng-icons/core';
               name="phone"
               [(ngModel)]="formData.phone"
               #phone="ngModel"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary bg-light-background dark:bg-gray-800 text-dark-text dark:text-white"
               placeholder="Enter your phone number"
             >
           </div>
-          
+
           <!-- Message Field -->
-          <div>
+         <div class="flex flex-col items-start justify-start">
             <label for="message" class="block text-sm font-medium text-dark-text dark:text-white mb-1">
               Message *
             </label>
@@ -113,14 +113,14 @@ import { NgIcon } from '@ng-icons/core';
               [(ngModel)]="formData.message"
               required
               #message="ngModel"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white resize-none"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary bg-light-background dark:bg-gray-800 text-dark-text dark:text-white resize-none"
               placeholder="How can we help you?"
             ></textarea>
             <div *ngIf="message.invalid && message.touched" class="text-red-500 text-sm mt-1">
               Message is required
             </div>
           </div>
-          
+
           <!-- Property Info (if applicable) -->
           <div *ngIf="propertyId" class="bg-light-background dark:bg-gray-800 p-3 rounded-lg">
             <p class="text-sm text-light-text dark:text-gray-300">
@@ -128,12 +128,12 @@ import { NgIcon } from '@ng-icons/core';
             </p>
           </div>
         </div>
-        
+
         <!-- Error Message -->
         <div *ngIf="error()" class="mt-4 p-3 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg">
           <p class="text-red-700 dark:text-red-400 text-sm">{{ error() }}</p>
         </div>
-        
+
         <!-- Form Actions -->
         <div class="flex space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
           <button
@@ -146,7 +146,7 @@ import { NgIcon } from '@ng-icons/core';
           <button
             type="submit"
             [disabled]="!contactForm.valid"
-            class="flex-1 bg-primary hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors duration-200"
+            class="primary flex-1 bg-primary hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors duration-200"
           >
             {{ contactType === 'agent' ? 'Contact Agent' : 'Send Message' }}
           </button>
@@ -163,7 +163,7 @@ export class ContactModalComponent {
   @Output() closed = new EventEmitter<void>();
 
   private contactService = inject(ContactService);
-  
+
   loading = signal(false);
   submitted = signal(false);
   error = signal('');
