@@ -296,6 +296,5 @@ This is the error on fly.io
 
 ---
 
-Finally we are in production at https://fresh-spaces.fly.dev/ and our github repo is at https://github.com/Nubuck/fresh-projects-house-showcase
 
-Please write a readme.md file for the project that includes a brief description of the project, installation instructions, running the project, building the project and deploying the project and include the fly.io production link
+
