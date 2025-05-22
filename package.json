@@ -6,12 +6,13 @@
     "node": ">=18.19.1"
   },
   "scripts": {
-    "start": "npm run dev",
+    "start": "npm run serve:ssr",
+    "start:dev": "npm run dev",
     "mix": "npx repomix",
     "ng": "ng",
     "dev": "ng serve",
-    "build": "ng build",
-    "build:ssr": "ng build --configuration production",
+    "build:dev": "ng build",
+    "build": "ng build --configuration production",
     "serve:ssr": "node dist/server/main.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
