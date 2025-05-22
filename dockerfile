@@ -35,8 +35,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 analog
 
-# Copy the built application
+# Copy the built application and data files
 COPY --from=builder --chown=analog:nodejs /app/dist ./dist
+COPY --from=builder --chown=analog:nodejs /app/src/server/data ./dist/server/data
 COPY --from=builder --chown=analog:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=analog:nodejs /app/node_modules ./node_modules
 

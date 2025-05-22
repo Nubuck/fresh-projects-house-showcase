@@ -3,8 +3,18 @@ import { defineEventHandler } from 'h3';
 import fs from 'fs';
 import path from 'path';
 
+function getDataPath(filename: string): string {
+  const isDev = process.env['NODE_ENV'] !== 'production';
+
+  if (isDev) {
+    return path.join(process.cwd(), 'src/server/data', filename);
+  } else {
+    return path.join(process.cwd(), 'dist/server/data', filename);
+  }
+}
+
 export default defineEventHandler(() => {
-  const filePath = path.join(process.cwd(), 'src/server/data/rooms.json');
+  const filePath = getDataPath('rooms.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   return data;
 });

@@ -266,3 +266,30 @@ Waiting for depot builder...
 0.479 sh: ng: not found
 ------
 Error: failed to fetch an image or build from source: error building: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 127
+
+
+---
+
+We have a problem on fly.io with the way we are referencing the data.json files in the api routes, we are referencing the file paths like const filePath = path.join(process.cwd(), 'src/server/data/properties.json'); which doesn't translate into production builds - can we use a relative path and ensure the .json files are copied to production?
+
+This is the error on fly.io
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] code: 'ENOENT',
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] syscall: 'open',
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] path: '/app/src/server/data/properties.json'
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] },
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] statusCode: 500,
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] fatal: false,
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] unhandled: true,
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] statusMessage: undefined,
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] data: undefined
+
+2025-05-22T04:22:44.522 app[17814752c07278] sjc [info] }
